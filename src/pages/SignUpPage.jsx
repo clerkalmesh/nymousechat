@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
@@ -10,7 +11,7 @@ const SignUpPage = () => {
     signupData,
     clearSignupData,
     updateDisplayName,
-    authUser,
+    checkAuth,
   } = useAuthStore();
 
   const [step, setStep] = useState(1);
@@ -28,9 +29,10 @@ const SignUpPage = () => {
 
   const handleAnimationComplete = async () => {
     setShowAnimation(false);
+
     try {
-      await signup();
-      setDisplayNameInput(authUser?.displayName || "Anonymous");
+      const data = await signup();
+      setDisplayNameInput(data.displayName || "Anonymous");
       setStep(2);
     } catch {
       setError("Gagal membuat identitas.");
@@ -65,25 +67,22 @@ const SignUpPage = () => {
     }
   };
 
-  const enterSystem = () => {
+  const enterSystem = async () => {
+    await checkAuth();
     clearSignupData();
     navigate("/");
   };
 
   return (
     <div className="min-h-screen bg-base-300 flex items-center justify-center relative overflow-hidden">
-
-      {/* Matrix Background */}
       <div className="matrix-bg"></div>
 
       {showAnimation && (
         <TerminalAnimation onComplete={handleAnimationComplete} />
       )}
 
-      <div className="card w-full max-w-md bg-base-100/90 backdrop-blur-md shadow-2xl border border-primary/30 relative z-10">
+      <div className="card w-full max-w-md bg-base-100/90 backdrop-blur-md shadow-2xl border border-primary/20 relative z-10">
         <div className="card-body">
-
-          {/* Header */}
           <div className="text-center space-y-1">
             <h2 className="text-2xl font-bold text-primary">
               Identity Protocol
@@ -96,10 +95,9 @@ const SignUpPage = () => {
           {/* Steps */}
           <div className="flex justify-between mt-4 mb-6 text-xs">
             {["Generate", "Secure", "Activate"].map((label, idx) => (
-              <div key={label} className="flex-1 text-center relative">
+              <div key={label} className="flex-1 text-center">
                 <div
-                  className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border
-                  ${
+                  className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border ${
                     step >= idx + 1
                       ? "border-primary bg-primary text-primary-content"
                       : "border-base-content/20 opacity-40"
@@ -107,12 +105,7 @@ const SignUpPage = () => {
                 >
                   {idx + 1}
                 </div>
-
                 <p className="mt-1 opacity-70">{label}</p>
-
-                {idx !== 2 && (
-                  <div className="absolute top-4 right-0 w-full h-px bg-base-content/10"></div>
-                )}
               </div>
             ))}
           </div>
@@ -120,10 +113,6 @@ const SignUpPage = () => {
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-4">
-              <p className="text-sm opacity-70 text-center">
-                Generate your secure anonymous identity
-              </p>
-
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating}
@@ -134,14 +123,7 @@ const SignUpPage = () => {
 
               {error && <div className="alert alert-error">{error}</div>}
 
-              <div className="divider text-xs opacity-40">
-                ALREADY HAVE A KEY?
-              </div>
-
-              <Link
-                to="/login"
-                className="btn btn-outline btn-secondary w-full"
-              >
+              <Link to="/login" className="btn btn-outline w-full">
                 Access Existing Identity
               </Link>
             </div>
@@ -150,79 +132,43 @@ const SignUpPage = () => {
           {/* STEP 2 */}
           {step === 2 && signupData && (
             <div className="space-y-4">
-
-              <div>
-                <p className="text-warning text-sm font-semibold">
-                  Secret Key (SAVE THIS)
-                </p>
-
-                <div className="bg-base-300 p-3 rounded-lg font-mono text-xs break-all border border-warning/30">
-                  {signupData.secretKey}
-                </div>
-
-                <button
-                  onClick={copyToClipboard}
-                  className="btn btn-xs btn-outline mt-2"
-                >
-                  Copy Key
-                </button>
+              <div className="bg-base-300 p-3 rounded-lg font-mono text-xs break-all">
+                {signupData.secretKey}
               </div>
+
+              <button onClick={copyToClipboard} className="btn btn-xs">
+                Copy Key
+              </button>
 
               <form onSubmit={handleUpdateDisplayName} className="space-y-2">
                 <input
-                  type="text"
                   value={displayNameInput}
                   onChange={(e) => setDisplayNameInput(e.target.value)}
-                  placeholder="Display name"
                   className="input input-bordered w-full"
                   maxLength={20}
                 />
-
-                <button
-                  disabled={isUpdating}
-                  className="btn btn-primary w-full"
-                >
+                <button className="btn btn-primary w-full">
                   {isUpdating ? "Updating..." : "Continue"}
                 </button>
               </form>
 
               {error && <div className="alert alert-error">{error}</div>}
-
-              <div className="divider text-xs opacity-30">OR</div>
-
-              <Link
-                to="/login"
-                className="btn btn-ghost btn-sm w-full"
-              >
-                I already have an identity
-              </Link>
             </div>
           )}
 
           {/* STEP 3 */}
           {step === 3 && signupData && (
             <div className="text-center space-y-3">
+              <p className="text-success font-bold">Identity Activated</p>
+              <p className="text-xl font-bold text-primary">
+                {signupData.anonymousId}
+              </p>
 
-              <h3 className="text-success font-bold">
-                Identity Activated
-              </h3>
-
-              <div className="bg-base-300 rounded-lg p-3">
-                <p className="text-xs opacity-60">Anonymous ID</p>
-                <p className="text-xl font-bold text-primary">
-                  {signupData.anonymousId}
-                </p>
-              </div>
-
-              <button
-                onClick={enterSystem}
-                className="btn btn-primary w-full"
-              >
+              <button onClick={enterSystem} className="btn btn-primary w-full">
                 Enter System
               </button>
             </div>
           )}
-
         </div>
       </div>
     </div>
