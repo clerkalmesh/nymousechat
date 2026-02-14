@@ -7,7 +7,7 @@ import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import ProtocolBootLoader from "./components/BootLoader";
-import { audioManager } from "../lib/audioManager";
+import { audioManager } from "./lib/audioManager";
 
 import { Toaster } from "react-hot-toast";
 
