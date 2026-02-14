@@ -36,14 +36,16 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 10% 20%, rgba(0, 255, 170, 0.05), transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(0, 180, 255, 0.04), transparent 40%),
-    linear-gradient(rgba(5, 5, 8, 0.96), rgba(5, 5, 8, 0.99));
-  pointer-events: none;
+    repeating-linear-gradient(
+      to right,
+      rgba(0, 255, 0, 0.05),
+      rgba(0, 255, 0, 0.05) 1px,
+      transparent 1px,
+      transparent 70px
+    );
   overflow: hidden;
 }
 
-/* Rain Layer */
 .matrix-bg::before {
   content: "";
   position: absolute;
@@ -51,12 +53,11 @@
   background: repeating-linear-gradient(
     to bottom,
     transparent 0px,
-    rgba(0, 255, 170, 0.08) 2px,
-    transparent 6px
+    rgba(0, 255, 0, 0.18) 2px,
+    transparent 4px
   );
-  animation: matrixRain 18s linear infinite;
-  opacity: 0.25;
-  mix-blend-mode: screen;
+  animation: matrixRain 14s linear infinite;
+  opacity: 0.12;
 }
 
 @keyframes matrixRain {
