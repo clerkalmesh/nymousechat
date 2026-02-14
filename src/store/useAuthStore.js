@@ -3,10 +3,10 @@ import axios from "../lib/axios";
 
 const useAuthStore = create((set, get) => ({
   authUser: null,
-  isCheckingAuth: true,
   signupData: null,
+  isCheckingAuth: true,
 
-  // ✅ SIGNUP → hanya generate identity
+  // ✅ SIGNUP = AUTO LOGIN (backend set JWT)
   signup: async () => {
     try {
       const res = await axios.post("/auth/signup");
@@ -19,6 +19,7 @@ const useAuthStore = create((set, get) => ({
           anonymousId: data.anonymousId,
           displayName: data.displayName,
         },
+        authUser: data, // ← karena JWT sudah diset
       });
 
       return data;
@@ -28,7 +29,6 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ✅ LOGIN → baru set authUser
   login: async (secretKey) => {
     try {
       const res = await axios.post("/auth/login", { secretKey });
@@ -51,6 +51,7 @@ const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     set({ isCheckingAuth: true });
+
     try {
       const res = await axios.get("/auth/check");
       set({ authUser: res.data });
@@ -65,14 +66,13 @@ const useAuthStore = create((set, get) => ({
     try {
       const res = await axios.put("/auth/update-profile", { displayName });
 
-      // update signupData + authUser jika ada
       const currentSignup = get().signupData;
 
       set({
+        authUser: res.data,
         signupData: currentSignup
           ? { ...currentSignup, displayName: res.data.displayName }
           : null,
-        authUser: res.data,
       });
 
       return res.data;

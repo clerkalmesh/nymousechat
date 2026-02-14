@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
@@ -6,13 +5,7 @@ import TerminalAnimation from "../components/TerminalAnimation";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const {
-    signup,
-    signupData,
-    clearSignupData,
-    updateDisplayName,
-    checkAuth,
-  } = useAuthStore();
+  const { signup, signupData, updateDisplayName, clearSignupData } = useAuthStore();
 
   const [step, setStep] = useState(1);
   const [showAnimation, setShowAnimation] = useState(false);
@@ -34,7 +27,8 @@ const SignUpPage = () => {
       const data = await signup();
       setDisplayNameInput(data.displayName || "Anonymous");
       setStep(2);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Gagal membuat identitas.");
     } finally {
       setIsGenerating(false);
@@ -42,6 +36,7 @@ const SignUpPage = () => {
   };
 
   const copyToClipboard = () => {
+    if (!signupData?.secretKey) return;
     navigator.clipboard.writeText(signupData.secretKey);
     alert("Secret key disalin");
   };
@@ -60,79 +55,44 @@ const SignUpPage = () => {
     try {
       await updateDisplayName(displayNameInput);
       setStep(3);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Gagal update display name");
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const enterSystem = async () => {
-    await checkAuth();
+  const enterSystem = () => {
     clearSignupData();
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen bg-base-300 flex items-center justify-center relative overflow-hidden">
-      <div className="matrix-bg"></div>
+    <div className="min-h-screen bg-base-300 flex items-center justify-center">
+      {showAnimation && <TerminalAnimation onComplete={handleAnimationComplete} />}
 
-      {showAnimation && (
-        <TerminalAnimation onComplete={handleAnimationComplete} />
-      )}
-
-      <div className="card w-full max-w-md bg-base-100/90 backdrop-blur-md shadow-2xl border border-primary/20 relative z-10">
+      <div className="card w-full max-w-md bg-base-100 shadow-xl">
         <div className="card-body">
-          <div className="text-center space-y-1">
-            <h2 className="text-2xl font-bold text-primary">
-              Identity Protocol
-            </h2>
-            <p className="text-xs opacity-60">
-              Anonymous Key-Based Authentication
-            </p>
-          </div>
+          <h2 className="text-xl font-bold text-center">Identity Protocol</h2>
 
-          {/* Steps */}
-          <div className="flex justify-between mt-4 mb-6 text-xs">
-            {["Generate", "Secure", "Activate"].map((label, idx) => (
-              <div key={label} className="flex-1 text-center">
-                <div
-                  className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center border ${
-                    step >= idx + 1
-                      ? "border-primary bg-primary text-primary-content"
-                      : "border-base-content/20 opacity-40"
-                  }`}
-                >
-                  {idx + 1}
-                </div>
-                <p className="mt-1 opacity-70">{label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* STEP 1 */}
           {step === 1 && (
-            <div className="space-y-4">
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="btn btn-primary w-full"
-              >
-                {isGenerating ? "Generating..." : "Generate Secret Identity"}
+            <>
+              <button onClick={handleGenerate} className="btn btn-primary w-full">
+                {isGenerating ? "Generating..." : "Generate Identity"}
               </button>
 
               {error && <div className="alert alert-error">{error}</div>}
 
               <Link to="/login" className="btn btn-outline w-full">
-                Access Existing Identity
+                Login Existing Identity
               </Link>
-            </div>
+            </>
           )}
 
-          {/* STEP 2 */}
           {step === 2 && signupData && (
-            <div className="space-y-4">
-              <div className="bg-base-300 p-3 rounded-lg font-mono text-xs break-all">
+            <>
+              <div className="bg-base-300 p-2 rounded text-xs break-all">
                 {signupData.secretKey}
               </div>
 
@@ -140,34 +100,32 @@ const SignUpPage = () => {
                 Copy Key
               </button>
 
-              <form onSubmit={handleUpdateDisplayName} className="space-y-2">
+              <form onSubmit={handleUpdateDisplayName}>
                 <input
                   value={displayNameInput}
                   onChange={(e) => setDisplayNameInput(e.target.value)}
                   className="input input-bordered w-full"
                   maxLength={20}
                 />
-                <button className="btn btn-primary w-full">
-                  {isUpdating ? "Updating..." : "Continue"}
+
+                <button className="btn btn-primary w-full mt-2">
+                  {isUpdating ? "Saving..." : "Activate"}
                 </button>
               </form>
 
               {error && <div className="alert alert-error">{error}</div>}
-            </div>
+            </>
           )}
 
-          {/* STEP 3 */}
           {step === 3 && signupData && (
-            <div className="text-center space-y-3">
-              <p className="text-success font-bold">Identity Activated</p>
-              <p className="text-xl font-bold text-primary">
-                {signupData.anonymousId}
-              </p>
+            <>
+              <p className="text-success text-center">Identity Activated</p>
+              <p className="text-center font-bold">{signupData.anonymousId}</p>
 
               <button onClick={enterSystem} className="btn btn-primary w-full">
                 Enter System
               </button>
-            </div>
+            </>
           )}
         </div>
       </div>
