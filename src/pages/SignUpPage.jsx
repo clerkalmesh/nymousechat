@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
 import TerminalAnimation from "../components/TerminalAnimation";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const { signup, signupData, updateDisplayName, clearSignupData } = useAuthStore();
+  const { signup, signupData } = useAuthStore();
 
   const [step, setStep] = useState(1);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [displayNameInput, setDisplayNameInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState("");
 
   const handleGenerate = () => {
@@ -24,106 +22,108 @@ const SignUpPage = () => {
     setShowAnimation(false);
 
     try {
-      const data = await signup();
-      setDisplayNameInput(data.displayName || "Anonymous");
+      await signup();
       setStep(2);
     } catch (err) {
       console.error(err);
-      setError("Gagal membuat identitas.");
+      setError("Identity generation failed.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const copyToClipboard = () => {
+  const copyKey = () => {
     if (!signupData?.secretKey) return;
     navigator.clipboard.writeText(signupData.secretKey);
-    alert("Secret key disalin");
   };
 
-  const handleUpdateDisplayName = async (e) => {
-    e.preventDefault();
+  const downloadKey = () => {
+    if (!signupData?.secretKey) return;
 
-    if (!displayNameInput.trim()) {
-      setError("Display name tidak boleh kosong");
-      return;
-    }
+    const blob = new Blob([signupData.secretKey], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
 
-    setError("");
-    setIsUpdating(true);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "secret-key.txt";
+    a.click();
 
-    try {
-      await updateDisplayName(displayNameInput);
-      setStep(3);
-    } catch (err) {
-      console.error(err);
-      setError("Gagal update display name");
-    } finally {
-      setIsUpdating(false);
-    }
+    URL.revokeObjectURL(url);
   };
 
-  const enterSystem = () => {
-    clearSignupData();
+  const continueToApp = () => {
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen bg-base-300 flex items-center justify-center">
-      {showAnimation && <TerminalAnimation onComplete={handleAnimationComplete} />}
+    <div className="min-h-screen bg-black text-green-400 flex items-center justify-center relative overflow-hidden">
+      
+      {/* Background matrix effect */}
+      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,rgba(0,255,0,0.15),transparent_70%)]" />
 
-      <div className="card w-full max-w-md bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="text-xl font-bold text-center">Identity Protocol</h2>
+      {showAnimation && (
+        <TerminalAnimation onComplete={handleAnimationComplete} />
+      )}
+
+      <div className="w-full max-w-md border border-green-500/30 bg-black/80 backdrop-blur-xl shadow-2xl rounded-lg">
+        <div className="p-6 space-y-4">
+
+          <h1 className="text-center text-xl font-bold tracking-widest">
+            IDENTITY PROTOCOL
+          </h1>
 
           {step === 1 && (
             <>
-              <button onClick={handleGenerate} className="btn btn-primary w-full">
-                {isGenerating ? "Generating..." : "Generate Identity"}
+              <div className="text-xs opacity-60 text-center">
+                Initialize anonymous identity
+              </div>
+
+              <button
+                onClick={handleGenerate}
+                className="w-full border border-green-500/40 hover:bg-green-500/10 transition-all py-2 rounded"
+              >
+                {isGenerating ? "GENERATING..." : "GENERATE IDENTITY"}
               </button>
 
-              {error && <div className="alert alert-error">{error}</div>}
-
-              <Link to="/login" className="btn btn-outline w-full">
-                Login Existing Identity
-              </Link>
+              {error && (
+                <div className="text-red-500 text-xs text-center">
+                  {error}
+                </div>
+              )}
             </>
           )}
 
           {step === 2 && signupData && (
             <>
-              <div className="bg-base-300 p-2 rounded text-xs break-all">
+              <div className="text-xs opacity-60">
+                Secret Key (store safely)
+              </div>
+
+              <div className="border border-green-500/30 bg-black p-3 text-xs break-all rounded">
                 {signupData.secretKey}
               </div>
 
-              <button onClick={copyToClipboard} className="btn btn-xs">
-                Copy Key
-              </button>
-
-              <form onSubmit={handleUpdateDisplayName}>
-                <input
-                  value={displayNameInput}
-                  onChange={(e) => setDisplayNameInput(e.target.value)}
-                  className="input input-bordered w-full"
-                  maxLength={20}
-                />
-
-                <button className="btn btn-primary w-full mt-2">
-                  {isUpdating ? "Saving..." : "Activate"}
+              <div className="flex gap-2">
+                <button
+                  onClick={copyKey}
+                  className="flex-1 border border-green-500/40 hover:bg-green-500/10 py-2 rounded text-xs"
+                >
+                  COPY
                 </button>
-              </form>
 
-              {error && <div className="alert alert-error">{error}</div>}
-            </>
-          )}
+                <button
+                  onClick={downloadKey}
+                  className="flex-1 border border-green-500/40 hover:bg-green-500/10 py-2 rounded text-xs"
+                >
+                  DOWNLOAD
+                </button>
+              </div>
 
-          {step === 3 && signupData && (
-            <>
-              <p className="text-success text-center">Identity Activated</p>
-              <p className="text-center font-bold">{signupData.anonymousId}</p>
-
-              <button onClick={enterSystem} className="btn btn-primary w-full">
-                Enter System
+              <button
+                onClick={continueToApp}
+                className="w-full mt-2 bg-green-500/10 border border-green-500/40 hover:bg-green-500/20 py-2 rounded"
+              >
+                CONTINUE
               </button>
             </>
           )}
