@@ -1,3 +1,66 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Cursor */
+.terminal-cursor {
+  animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+  to { visibility: hidden; }
+}
+
+/* Scanlines */
+.scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 255, 0, 0.05),
+    rgba(0, 255, 0, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.25;
+  mix-blend-mode: screen;
+}
+
+/* Noise */
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+/* Matrix Background */
+.matrix-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(0, 255, 0, 0.05),
+      rgba(0, 255, 0, 0.05) 1px,
+      transparent 1px,
+      transparent 70px
+    );
+  overflow: hidden;
+}
+
+.matrix-bg::before {
+  content: "";
+  position: absolute;
+  inset: -100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    rgba(0, 255, 0, 0.18) 2px,
+    transparent 4px
+  );
+  animation: matrixRain 14s linear infinite;
+  opacity: 0.12;
+}
+
+@keyframes matrixRain {
+  from { transform: translateY(-50%); }
+  to { transform: translateY(50%); }
+}

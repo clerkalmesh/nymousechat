@@ -1,23 +1,32 @@
+// frontend/src/store/useAuthStore.js
 import { create } from 'zustand';
 import axios from '../lib/axios';
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   authUser: null,
   isCheckingAuth: true,
-  signupData: null,
+  signupData: null, // menyimpan secretKey dan anonymousId sementara
 
+  // Signup: request ke backend
   signup: async () => {
     try {
       const res = await axios.post('/auth/signup');
       const data = res.data;
       set({
-        signupData: { secretKey: data.secretKey, anonymousId: data.anonymousId },
-        authUser: { _id: data._id, anonymousId: data.anonymousId, displayName: data.displayName }
+        signupData: {
+          secretKey: data.secretKey,
+          anonymousId: data.anonymousId
+        },
+        authUser: {
+          _id: data._id,
+          anonymousId: data.anonymousId,
+          displayName: data.displayName
+        }
       });
       return data;
     } catch (error) {
-      console.error(error);
-      throw error;
+      console.error('Signup error:', error);
+      throw error; // lempar error agar bisa ditangani di komponen
     }
   },
 
@@ -27,7 +36,7 @@ const useAuthStore = create((set) => ({
       set({ authUser: res.data });
       return res.data;
     } catch (error) {
-      console.error(error);
+      console.error('Login error:', error);
       throw error;
     }
   },
@@ -37,7 +46,7 @@ const useAuthStore = create((set) => ({
       await axios.post('/auth/logout');
       set({ authUser: null, signupData: null });
     } catch (error) {
-      console.error(error);
+      console.error('Logout error:', error);
     }
   },
 
@@ -56,10 +65,11 @@ const useAuthStore = create((set) => ({
   updateDisplayName: async (displayName) => {
     try {
       const res = await axios.put('/auth/update-profile', { displayName });
+      // perbarui authUser dengan displayName baru
       set({ authUser: res.data });
       return res.data;
     } catch (error) {
-      console.error(error);
+      console.error('Update display name error:', error);
       throw error;
     }
   },
