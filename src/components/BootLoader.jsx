@@ -48,25 +48,32 @@ const philosophyLines = [
 
 export default function ProtocolBootLoader() {
   const navigate = useNavigate();
+  const inputRef = useRef(null);
 
   const [lines, setLines] = useState([]);
   const [input, setInput] = useState("");
   const [stage, setStage] = useState("intro");
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    audioManager.playBgm("boot");   // MUSIK START LOOP
-
-    return () => {
-      audioManager.stopBgm();       // STOP saat keluar page
-    };
-  }, []);
-
   const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  // ================= MUSIC CONTROL
+  useEffect(() => {
+    audioManager.playBgm("boot", { volume: 1 }); // FULL VOLUME
+
+    return () => audioManager.stopBgm();
+  }, []);
+
+  // ================= AUTOFOCUS (CRITICAL FOR MOBILE)
+  useEffect(() => {
+    if (stage === "intro") {
+      setTimeout(() => inputRef.current?.focus(), 300);
+    }
+  }, [stage]);
+
+  // ================= REALISTIC TYPING
   const typeLine = async (text, speed = 16) => {
     let buffer = "";
-
     setLines((prev) => [...prev, ""]);
 
     for (let i = 0; i < text.length; i++) {
@@ -88,41 +95,27 @@ export default function ProtocolBootLoader() {
 
     const run = async () => {
       setLines([]);
-
       for (const line of introLines) {
         await typeLine(line, 22);
-        await delay(120);
+        await delay(140);
       }
     };
 
     run();
   }, [stage]);
 
-  // ================= INPUT
-  useEffect(() => {
-    const handler = (e) => {
-      if (stage !== "intro") return;
+  // ================= INPUT HANDLER (WORKS EVERYWHERE)
+  const handleKeyDown = (e) => {
+    if (stage !== "intro") return;
 
-      if (e.key.length === 1) {
-        setInput((p) => (p + e.key).toUpperCase());
+    if (e.key === "Enter") {
+      if (input.trim().toUpperCase() === "ENTER") {
+        audioManager.play("enter");
+        setStage("update");
+        setInput("");
       }
-
-      if (e.key === "Backspace") {
-        setInput((p) => p.slice(0, -1));
-      }
-
-      if (e.key === "Enter") {
-        if (input === "ENTER") {
-          audioRef.current?.play();
-          setStage("update");
-          setInput("");
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [input, stage]);
+    }
+  };
 
   // ================= UPDATE
   useEffect(() => {
@@ -130,12 +123,10 @@ export default function ProtocolBootLoader() {
 
     const run = async () => {
       setLines([]);
-
       for (const line of updateLines) {
         await typeLine(line, 10);
-        await delay(40);
+        await delay(50);
       }
-
       setStage("progress");
     };
 
@@ -148,8 +139,8 @@ export default function ProtocolBootLoader() {
 
     if (progress < 100) {
       const t = setTimeout(() => {
-        setProgress((p) => Math.min(p + Math.random() * 6, 100));
-      }, 70);
+        setProgress((p) => Math.min(p + Math.random() * 5, 100));
+      }, 90);
 
       return () => clearTimeout(t);
     } else {
@@ -163,15 +154,12 @@ export default function ProtocolBootLoader() {
 
     const run = async () => {
       setLines([]);
-
       for (const line of philosophyLines) {
-        await typeLine(line, 18);
-        await delay(120);
+        await typeLine(line, 20);
+        await delay(160);
       }
 
-      await delay(500);
-
-      // FINAL → langsung login page
+      await delay(700);
       navigate("/login");
     };
 
@@ -179,63 +167,85 @@ export default function ProtocolBootLoader() {
   }, [stage]);
 
   const renderBar = () => {
-    const total = 22;
+    const total = 26;
     const filled = Math.round((progress / 100) * total);
     return "█".repeat(filled) + "░".repeat(total - filled);
   };
 
   return (
-    <div className="h-screen bg-black flex items-center justify-center relative overflow-hidden">
-      <div className="absolute inset-0 bg-purple-500/5 blur-3xl" />
+    <div className="h-screen bg-black text-purple-300 font-mono">
+      <div className="h-full w-full flex items-center justify-center">
 
-      <div
-        className="
-          relative w-full max-w-3xl
-          mx-4 sm:mx-6
-          bg-black/80 backdrop-blur-xl
-          border border-purple-500/30
-          shadow-[0_0_60px_rgba(168,85,247,0.35)]
-          rounded-xl
-          p-4 sm:p-6 md:p-8
-          font-mono
-          text-sm sm:text-base md:text-lg
-          text-purple-300
-        "
-      >
-        {/* HEADER */}
-        <div className="flex items-center gap-2 mb-4 opacity-40 text-xs sm:text-sm">
-          <div className="w-2 h-2 rounded-full bg-red-500" />
-          <div className="w-2 h-2 rounded-full bg-yellow-500" />
-          <div className="w-2 h-2 rounded-full bg-green-500" />
-          <span className="ml-2 tracking-wider">memesh_runtime v3.1</span>
+        <div
+          className="
+            w-full max-w-4xl
+            mx-3 sm:mx-6
+            p-5 sm:p-8
+            text-base sm:text-lg
+            bg-black/80 backdrop-blur-xl
+            border border-purple-500/30
+            shadow-[0_0_80px_rgba(168,85,247,0.35)]
+            rounded-xl
+            relative
+          "
+        >
+          {/* HEADER */}
+          <div className="flex items-center gap-2 mb-6 opacity-40 text-xs sm:text-sm">
+            <div className="w-2 h-2 rounded-full bg-red-500" />
+            <div className="w-2 h-2 rounded-full bg-yellow-500" />
+            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="ml-2 tracking-widest">
+              memesh_runtime v3.1
+            </span>
+          </div>
+
+          {/* TERMINAL */}
+          <div className="space-y-2 leading-relaxed">
+            {lines.map((line, idx) => (
+              <div key={idx} className="opacity-80">
+                {line}
+              </div>
+            ))}
+
+            {stage === "intro" && (
+              <div className="mt-4 flex items-center">
+                <span className="text-purple-500 mr-2">&gt;</span>
+
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="
+                    bg-transparent
+                    outline-none
+                    w-full
+                    text-purple-200
+                    caret-purple-400
+                  "
+                />
+
+                <span className="animate-pulse text-purple-400">█</span>
+              </div>
+            )}
+
+            {stage === "progress" && (
+              <div className="mt-4 text-purple-400">
+                system upgrade progress
+                <div>[{renderBar()}] {progress.toFixed(0)}%</div>
+              </div>
+            )}
+          </div>
+
+          {/* SCANLINES */}
+          <div className="pointer-events-none absolute inset-0 opacity-[0.035]
+            bg-[linear-gradient(to_bottom,white,transparent_2px)]
+            bg-[length:100%_4px]" />
         </div>
 
-        {/* TERMINAL */}
-        <div className="space-y-1">
-          {lines.map((line, idx) => (
-            <div key={idx} className="opacity-80">
-              {line}
-            </div>
-          ))}
-
-          {stage === "intro" && (
-            <div className="mt-3 flex">
-              <span className="text-purple-500 mr-2">&gt;</span>
-              <span>{input}</span>
-              <span className="animate-pulse">█</span>
-            </div>
-          )}
-
-          {stage === "progress" && (
-            <div className="mt-4 text-purple-400">
-              system upgrade progress
-              <div>[{renderBar()}] {progress.toFixed(0)}%</div>
-            </div>
-          )}
-        </div>
-
-        {/* scanlines */}
-        <div className="pointer-events-none absolute inset-0 opacity-[0.035] bg-[linear-gradient(to_bottom,white,transparent_2px)] bg-[length:100%_4px]" />
       </div>
     </div>
   );
