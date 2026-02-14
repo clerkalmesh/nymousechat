@@ -5,6 +5,10 @@ import useAuthStore from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
 import { useEffect } from "react";
 
+import HomePage from "./pages/HomePage"
+import SignUpPage from "./pages/SignUpPage"
+import LoginPage from "./pages/LoginPage"
+
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
@@ -27,7 +31,7 @@ const App = () => {
 
   return (
     <div data-theme={theme}>
-      <Navbar />
+      
 
       <Routes>
         <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
