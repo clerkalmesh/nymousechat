@@ -12,7 +12,7 @@ import { audioManager } from "./lib/audioManager";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
-  const { authUser, checkAuth } = useAuthStore();
+  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
   const { theme } = useThemeStore();
   
   useEffect(() => {
@@ -22,15 +22,13 @@ const App = () => {
   }, []);
 
 
-  // FLAG PENTING → cegah bootloader hilang cepat
-  const [bootDone, setBootDone] = useState(false);
-
   useEffect(() => {
     checkAuth();
   }, []);
 
-  if (!bootDone) {
-    return <ProtocolBootLoader onComplete={() => setBootDone(true)} />;
+  // ✅ Boot hanya tampil selama auth check berjalan
+  if (isCheckingAuth) {
+    return <ProtocolBootLoader />;
   }
 
   return (
