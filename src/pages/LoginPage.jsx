@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
 
 // ======================
-// Matrix Rain Canvas (Pink Edition)
+// Matrix Rain Canvas – Satu untuk seluruh halaman
 // ======================
 const MatrixRain = ({ className }) => {
   const canvasRef = useRef(null);
@@ -21,9 +21,7 @@ const MatrixRain = ({ className }) => {
     };
     setCanvasDimensions();
 
-    const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(
-      ""
-    );
+    const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
     const fontSize = 16;
     const columns = width / fontSize;
     const drops = new Array(Math.floor(columns)).fill(1);
@@ -59,7 +57,7 @@ const MatrixRain = ({ className }) => {
 };
 
 // ======================
-// Main Component
+// Halaman Login
 // ======================
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -70,15 +68,13 @@ const LoginPage = () => {
   const [executionLogs, setExecutionLogs] = useState([]);
   const [error, setError] = useState("");
 
-  // Utility to delay execution
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-  // Typing effect for a single line
   const typeLine = async (line, speed = 40) => {
     let currentText = "";
     for (let i = 0; i < line.length; i++) {
       currentText += line[i];
-      setExecutionLogs((prev) => [...prev.slice(0, -1), currentText]); // replace last line
+      setExecutionLogs((prev) => [...prev.slice(0, -1), currentText]);
       await delay(speed);
     }
   };
@@ -91,24 +87,47 @@ const LoginPage = () => {
     setExecutionLogs([]);
     setError("");
 
-    // Start terminal sequence
-    setExecutionLogs(["$"]); // initial prompt
-
-    // Type the command
+    // Mulai terminal
+    setExecutionLogs(["$"]);
     await typeLine("$ auth --verify", 60);
-    await delay(200);
+    await delay(300);
 
-    // Output lines
-    setExecutionLogs((prev) => [...prev, "> validating credentials..."]);
-    await delay(600);
+    // Langkah-langkah autentikasi (~15 detik)
+    setExecutionLogs((prev) => [...prev, "> establishing secure channel..."]);
+    await delay(1200);
+
+    setExecutionLogs((prev) => [...prev, "> requesting authentication challenge..."]);
+    await delay(1000);
+
+    setExecutionLogs((prev) => [...prev, "> processing challenge response..."]);
+    await delay(1300);
+
+    setExecutionLogs((prev) => [...prev, "> verifying cryptographic signature..."]);
+    await delay(1500);
+
+    setExecutionLogs((prev) => [...prev, "> checking certificate revocation list..."]);
+    await delay(1400);
+
+    setExecutionLogs((prev) => [...prev, "> validating identity permissions..."]);
+    await delay(1200);
+
     setExecutionLogs((prev) => [...prev, "> comparing secure hash..."]);
-    await delay(600);
+    await delay(1300);
 
+    setExecutionLogs((prev) => [...prev, "> validating credentials..."]);
+    await delay(1400);
+
+    setExecutionLogs((prev) => [...prev, "> decrypting identity token..."]);
+    await delay(1500);
+
+    setExecutionLogs((prev) => [...prev, "> finalizing authentication..."]);
+    await delay(1000);
+
+    // Proses login
     try {
       await login(secretKey);
-
       setExecutionLogs((prev) => [...prev, "> identity verified..."]);
-      await delay(400);
+      await delay(600);
       setExecutionLogs((prev) => [...prev, "> access granted."]);
       await delay(900);
       navigate("/");
@@ -121,28 +140,26 @@ const LoginPage = () => {
     }
   };
 
-  // ======================
-  // EXECUTION SCREEN (Terminal)
-  // ======================
+  // Konten dinamis: form login atau terminal
+  let content;
   if (isExecuting) {
-    return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <MatrixRain className="opacity-30" /> {/* Pink rain in background */}
+    content = (
+      <div className="fixed inset-0 flex items-center justify-center z-10">
         <div className="relative w-full max-w-2xl mx-4">
           <div className="absolute inset-0 bg-pink-500/5 blur-3xl" />
           <div className="relative bg-black border border-pink-500/30 rounded-xl shadow-2xl overflow-hidden shadow-pink-500/20">
-            {/* Terminal header */}
+            {/* Header terminal */}
             <div className="flex items-center gap-2 px-4 py-2 border-b border-pink-500/10 bg-pink-500/5">
               <div className="w-3 h-3 rounded-full bg-red-500/70" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
               <div className="w-3 h-3 rounded-full bg-pink-500/70" />
               <div className="ml-2 text-xs text-pink-400/60 font-mono">
-                bash:mesh-authentication
+                bash:mesh-authentication (15s simulation)
               </div>
             </div>
 
-            {/* Terminal content */}
-            <div className="relative p-6 font-mono text-pink-400 text-lg min-h-[300px]">
+            {/* Konten terminal */}
+            <div className="relative p-6 font-mono text-pink-400 text-lg min-h-[350px]">
               <div className="scanlines absolute inset-0 pointer-events-none" />
               <div className="noise absolute inset-0 pointer-events-none" />
 
@@ -154,7 +171,6 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* Extra styles for scanlines and cursor */}
         <style jsx>{`
           .scanlines {
             background: repeating-linear-gradient(
@@ -186,62 +202,66 @@ const LoginPage = () => {
         `}</style>
       </div>
     );
-  }
-
-  // ======================
-  // LOGIN FORM (Normal UI)
-  // ======================
-  return (
-    <div className="min-h-screen bg-base-300 flex items-center justify-center relative overflow-hidden">
-      <MatrixRain className="opacity-20" /> {/* Pink matrix behind form */}
-
-      <div className="card w-full max-w-md bg-base-100/90 backdrop-blur-md shadow-2xl border border-pink-500/30 relative z-10 shadow-pink-500/10">
-        <div className="card-body">
-          {/* Header */}
-          <div className="text-center space-y-1 mb-4">
-            <h2 className="text-2xl font-bold text-pink-500">
-              Mesh Protocols Chat
-            </h2>
-            <p className="text-xs opacity-60">Access via Secret Key</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div>
-              <label className="text-xs opacity-60">Secret Key</label>
-              <input
-                type="text"
-                value={secretKey}
-                onChange={(e) => setSecretKey(e.target.value)}
-                className="input input-bordered w-full font-mono focus:border-pink-500 focus:ring-pink-500/30"
-                placeholder="Enter your secret key"
-                autoFocus
-              />
+  } else {
+    content = (
+      <div className="flex items-center justify-center min-h-screen z-10">
+        <div className="card w-full max-w-md bg-black/90 backdrop-blur-md shadow-2xl border border-pink-500/30 relative shadow-pink-500/10">
+          <div className="card-body">
+            {/* Header */}
+            <div className="text-center space-y-1 mb-4">
+              <h2 className="text-2xl font-bold text-pink-500">
+                Mesh Protocols Chat
+              </h2>
+              <p className="text-xs opacity-60">Access via Secret Key</p>
             </div>
 
-            {error && (
-              <div className="alert alert-error text-sm bg-red-500/10 border-red-500/30 text-red-400">
-                <span>{error}</span>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div>
+                <label className="text-xs opacity-60">Secret Key</label>
+                <input
+                  type="text"
+                  value={secretKey}
+                  onChange={(e) => setSecretKey(e.target.value)}
+                  className="input input-bordered w-full font-mono focus:border-pink-500 focus:ring-pink-500/30 bg-black/50 text-pink-500"
+                  placeholder="Enter your secret key"
+                  autoFocus
+                />
               </div>
-            )}
 
-            <button
-              type="submit"
-              className="btn btn-pink w-full bg-pink-600 hover:bg-pink-700 border-pink-500 text-white"
+              {error && (
+                <div className="alert alert-error text-sm bg-red-500/10 border-red-500/30 text-red-400">
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn btn-pink w-full bg-pink-600 hover:bg-pink-700 border-pink-500 text-white"
+              >
+                Run Authenticate
+              </button>
+            </form>
+
+            <div className="divider text-xs opacity-40">OR</div>
+
+            <Link
+              to="/signup"
+              className="btn btn-outline btn-pink w-full border-pink-500 text-pink-500 hover:bg-pink-500/10"
             >
-              Run Authenticate
-            </button>
-          </form>
-
-          <div className="divider text-xs opacity-40">OR</div>
-
-          <Link
-            to="/signup"
-            className="btn btn-outline btn-pink w-full border-pink-500 text-pink-500 hover:bg-pink-500/10"
-          >
-            Generate New Identity
-          </Link>
+              Generate New Identity
+            </Link>
+          </div>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen bg-black font-mono text-pink-500 overflow-hidden">
+      {/* Matrix latar belakang – satu untuk seluruh halaman */}
+      <MatrixRain className="opacity-20" />
+      {/* Konten di atas matrix */}
+      {content}
     </div>
   );
 };
