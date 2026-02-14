@@ -29,9 +29,8 @@ const SignUpPage = () => {
         "> secret key generated.",
         "> identity created successfully."
       ]);
-      setStep(2);
-      // Copy otomatis
-      if (data?.secretKey) navigator.clipboard.writeText(data.secretKey);
+      setStep(2); // Step 2 muncul, **tidak auto redirect**
+      if (data?.secretKey) navigator.clipboard.writeText(data.secretKey); // Auto copy
     } catch (err) {
       console.error(err);
       setError("Failed to generate identity");
@@ -57,14 +56,12 @@ const SignUpPage = () => {
 
   const continueToSystem = () => {
     clearSignupData();
-    navigate("/");
+    navigate("/"); // Redirect hanya **klik Continue**
   };
 
   /* TERMINAL SCREEN */
   if (showTerminal) {
-    return (
-      <TerminalAnimation onComplete={handleAnimationComplete} logs={executionLogs} />
-    );
+    return <TerminalAnimation onComplete={handleAnimationComplete} logs={executionLogs} />;
   }
 
   /* STEP 2 UI - ACCESS GRANTED */
