@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
-import ProtocolBootLoader from "./components/BootLoader";
+//import ProtocolBootLoader from "./components/BootLoader";
 import { audioManager } from "./lib/audioManager";
 
 import { Toaster } from "react-hot-toast";
@@ -26,17 +26,14 @@ const App = () => {
     checkAuth();
   }, []);
 
-  // ✅ Boot hanya tampil selama auth check berjalan
-  if (isCheckingAuth) {
-    return <ProtocolBootLoader />;
-  }
+  
 
   return (
     <div data-theme={theme}>
       <Routes>
-        <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+        <Route path="/" element={<HomePage  />}/>
         <Route path="/signup" element={<SignUpPage /> } />
-        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/chat" />} />
       </Routes>
 
       <Toaster />
