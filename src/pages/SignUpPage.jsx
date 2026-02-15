@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
 import MatrixRain from '../components/MatrixRain';
-import { audioManager } from "../lib/audioManager";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -17,14 +16,6 @@ const SignUpPage = () => {
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
  
-  useEffect(() => {
-    audioManager.playBgm("boot");   // MUSIK START LOOP
-
-    return () => {
-      audioManager.stopBgm();       // STOP saat keluar page
-    };
-  }, []);
-
   const typeLine = async (line, speed = 40) => {
     let currentText = '';
     for (let i = 0; i < line.length; i++) {
@@ -120,7 +111,7 @@ const SignUpPage = () => {
 
   const continueToSystem = () => {
     clearSignupData();
-    navigate('/');
+    navigate('/home');
   };
 
   // Render konten berdasarkan state

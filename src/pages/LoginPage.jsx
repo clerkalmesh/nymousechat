@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
 import MatrixRain from '../components/MatrixRain';
-import { audioManager } from "../lib/audioManager";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -14,14 +13,6 @@ const LoginPage = () => {
   const [error, setError] = useState('');
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-  
-  useEffect(() => {
-    audioManager.playBgm("boot");   // MUSIK START LOOP
-
-    return () => {
-      audioManager.stopBgm();       // STOP saat keluar page
-    };
-  }, []);
 
   const typeLine = async (line, speed = 30) => {
     let currentText = '';
