@@ -4,7 +4,8 @@ import toast from "react-hot-toast";
 import axiosInstance from "../lib/axios";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000" : "/";
+//const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000" : "/";
+const BASE_URL = "https://backtesting-production.up.railway.app";
 
 const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -129,7 +130,7 @@ const useAuthStore = create((set, get) => ({
     // Gunakan withCredentials agar cookie JWT terkirim otomatis
     const newSocket = io(BASE_URL, {
       withCredentials: true,
-      transports: ["websocket"], // opsional, untuk performa
+//      transports: ["websocket"], // opsional, untuk performa
     });
 
     newSocket.on("connect", () => {
