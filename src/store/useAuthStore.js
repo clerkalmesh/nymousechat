@@ -1,7 +1,7 @@
 // frontend/src/store/useAuthStore.js
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../lib/axios";
+import axiosInstance from "../lib/axios";
 import { io } from "socket.io-client";
 
 const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000" : "/";
