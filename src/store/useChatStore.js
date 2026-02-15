@@ -67,7 +67,7 @@ export const useChatStore = create((set, get) => ({
     if (socket) socket.off("newMessage");
   },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser}) ),
+  setSelectedUser: (selectedUser) => set({ selectedUser }),
 
   // Global chat
   getGlobalMessages: async () => {
