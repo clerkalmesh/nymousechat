@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ProtocolBootLoader from "./BooLoader"
+import ProtocolBootLoader from "./BootLoader"
 
 export default function BootWrapper({ children }) {
   const [bootComplete, setBootComplete] = useState(false);
