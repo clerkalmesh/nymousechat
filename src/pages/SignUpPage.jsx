@@ -111,7 +111,7 @@ const SignUpPage = () => {
 
   const continueToSystem = () => {
     clearSignupData();
-    navigate('/home');
+    navigate('/');
   };
 
   // Render konten berdasarkan state
