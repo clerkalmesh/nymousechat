@@ -7,7 +7,7 @@ import useAuthStore from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
 import GlobalChat from "./GlobalChat";
 
-const ChatContainer = () => {
+const ChatContainer = ({ isGlobalMode }) => {
   const {
     messages,
     getMessages,
@@ -15,28 +15,27 @@ const ChatContainer = () => {
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
-    mode,
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    if (mode === "private" && selectedUser) {
+    if (!isGlobalMode && selectedUser) {
       getMessages(selectedUser._id);
       subscribeToMessages();
     }
     return () => {
       unsubscribeFromMessages();
     };
-  }, [mode, selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+  }, [isGlobalMode, selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
-    if (mode === "private" && messageEndRef.current && messages) {
+    if (!isGlobalMode && messageEndRef.current && messages) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, mode]);
+  }, [messages, isGlobalMode]);
 
-  if (mode === "global") {
+  if (isGlobalMode) {
     return <GlobalChat />;
   }
 

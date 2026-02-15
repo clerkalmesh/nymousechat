@@ -4,8 +4,8 @@ import useAuthStore from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { Users, Search, X, Globe } from "lucide-react";
 
-const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading, setMode, mode } = useChatStore();
+const Sidebar = ({ isGlobalMode, setIsGlobalMode }) => {
+  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,13 +24,18 @@ const Sidebar = () => {
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
-    if (window.innerWidth < 1024) setIsMobileOpen(false);
+    setIsGlobalMode(false); // keluar dari global mode
+    if (window.innerWidth < 1024) {
+      setIsMobileOpen(false);
+    }
   };
 
   const handleSelectGlobal = () => {
-    setMode("global");
-    setSelectedUser(null);
-    if (window.innerWidth < 1024) setIsMobileOpen(false);
+    setIsGlobalMode(true);
+    setSelectedUser(null); // bersihkan selected user
+    if (window.innerWidth < 1024) {
+      setIsMobileOpen(false);
+    }
   };
 
   if (isUsersLoading) return <SidebarSkeleton />;
@@ -101,7 +106,7 @@ const Sidebar = () => {
           onClick={handleSelectGlobal}
           className={`
             w-full p-3 flex items-center gap-3 hover:bg-base-200 transition-colors border-b border-base-200
-            ${mode === "global" ? "bg-base-200 ring-1 ring-primary" : ""}
+            ${isGlobalMode ? "bg-base-200 ring-1 ring-primary" : ""}
           `}
         >
           <div className="relative flex-shrink-0">
