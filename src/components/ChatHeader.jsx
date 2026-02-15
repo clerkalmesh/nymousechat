@@ -6,33 +6,35 @@ const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
 
-  return (
-    <div className="p-2.5 border-b border-base-300">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="avatar">
-            <div className="size-10 rounded-full relative">
-              <img src={selectedUser.profilePic || "/avatar.png"} alt={selectedUser.displayName} />
-            </div>
-          </div>
+  if (!selectedUser) return null;
 
-          {/* User info */}
-          <div>
-            <h1 className="font-bold text-blue-600">{setSelectedUser.anonymousId}</h1>
-            <h3 className="font-medium">{selectedUser.displayName}</h3>
-            <p className="text-sm text-base-content/70">
-              {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
-            </p>
+  return (
+    <div className="p-3 border-b border-base-300 bg-base-100 flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <div className="avatar">
+          <div className="size-10 rounded-full relative">
+            <img
+              src={selectedUser.profilePic || "/avatar.png"}
+              alt={selectedUser.displayName}
+            />
           </div>
         </div>
-
-        {/* Close button */}
-        <button onClick={() => setSelectedUser(null)}>
-          <X />
-        </button>
+        <div>
+          <h3 className="font-semibold">{selectedUser.anonymousId}</h3>
+          <p className="text-sm text-base-content/70">{selectedUser.displayName}</p>
+          <p className="text-xs text-base-content/50">
+            {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+          </p>
+        </div>
       </div>
+      <button
+        onClick={() => setSelectedUser(null)}
+        className="btn btn-ghost btn-sm btn-circle"
+      >
+        <X size={18} />
+      </button>
     </div>
   );
 };
+
 export default ChatHeader;

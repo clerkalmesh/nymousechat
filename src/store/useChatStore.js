@@ -1,4 +1,3 @@
-// frontend/src/store/useChatStore.js
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import axiosInstance from "../lib/axios";
@@ -10,8 +9,10 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  globalMessages: [],
+  isGlobalLoading: false,
 
-  // Ambil daftar user untuk sidebar (kecuali diri sendiri)
+  // Private chat
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
@@ -24,7 +25,6 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Ambil riwayat pesan dengan user tertentu
   getMessages: async (userId) => {
     set({ isMessagesLoading: true });
     try {
@@ -37,11 +37,9 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Kirim pesan baru (via HTTP) dan tambahkan ke state lokal
   sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
     if (!selectedUser) return;
-
     try {
       const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
       set({ messages: [...messages, res.data] });
@@ -50,45 +48,60 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Berlangganan event pesan baru dari socket (hanya dari lawan bicara yang sedang dipilih)
   subscribeToMessages: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;
-
     const socket = useAuthStore.getState().socket;
-    if (!socket) {
-      console.warn("Socket belum tersedia");
-      return;
-    }
+    if (!socket) return;
 
     const handleNewMessage = (newMessage) => {
-      // Hanya proses jika pesan berasal dari user yang sedang dipilih
-      const isFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isFromSelectedUser) return;
-
-      set((state) => ({
-        messages: [...state.messages, newMessage],
-      }));
+      if (newMessage.senderId === selectedUser._id) {
+        set((state) => ({ messages: [...state.messages, newMessage] }));
+      }
     };
-
     socket.on("newMessage", handleNewMessage);
-
-    // Simpan handler untuk cleanup jika perlu (opsional)
-    // Kita bisa mengembalikan fungsi unsubscribe, tapi kita sudah punya method terpisah
   },
 
-  // Berhenti berlangganan event pesan baru
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    if (socket) {
-      socket.off("newMessage");
+    if (socket) socket.off("newMessage");
+  },
+
+  setSelectedUser: (selectedUser) => set({ selectedUser}) ),
+
+  // Global chat
+  getGlobalMessages: async () => {
+    set({ isGlobalLoading: true });
+    try {
+      const res = await axiosInstance.get("/global/get");
+      set({ globalMessages: res.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Gagal mengambil pesan global");
+    } finally {
+      set({ isGlobalLoading: false });
     }
   },
 
-  // Pilih user untuk chat
-  setSelectedUser: (selectedUser) => {
-    set({ selectedUser });
-    // Reset pesan ketika berganti user (opsional)
-    //set({ messages: [] });
+  sendGlobalMessage: async (messageData) => {
+    try {
+      const res = await axiosInstance.post("/global/send", messageData);
+      set((state) => ({ globalMessages: [...state.globalMessages, res.data] }));
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Gagal mengirim pesan global");
+      throw error;
+    }
+  },
+
+  subscribeToGlobal: () => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+    socket.on("newGlobalMessage", (newMessage) => {
+      set((state) => ({ globalMessages: [...state.globalMessages, newMessage] }));
+    });
+  },
+
+  unsubscribeFromGlobal: () => {
+    const socket = useAuthStore.getState().socket;
+    if (socket) socket.off("newGlobalMessage");
   },
 }));

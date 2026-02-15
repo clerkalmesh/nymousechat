@@ -1,87 +1,143 @@
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-import useAuthStore  from "../store/useAuthStore";
+import useAuthStore from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users } from "lucide-react";
+import { Users, Search, X } from "lucide-react";
 
 const Sidebar = () => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
-
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     getUsers();
   }, [getUsers]);
 
-  const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
-    : users;
+  // Filter berdasarkan online status dan search
+  const filteredUsers = users
+    .filter((user) => (showOnlineOnly ? onlineUsers.includes(user._id) : true))
+    .filter((user) =>
+      user.anonymousId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+  const handleSelectUser = (user) => {
+    setSelectedUser(user);
+    // Di mobile, tutup sidebar setelah pilih user
+    if (window.innerWidth < 1024) {
+      setIsMobileOpen(false);
+    }
+  };
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
   return (
-    <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-      <div className="border-b border-base-300 w-full p-5">
-        <div className="flex items-center gap-2">
-          <Users className="size-6" />
-          <span className="font-medium hidden lg:block">Contacts</span>
-        </div>
-        {/* TODO: Online filter toggle */}
-        <div className="mt-3 hidden lg:flex items-center gap-2">
-          <label className="cursor-pointer flex items-center gap-2">
+    <>
+      {/* Tombol hamburger untuk mobile */}
+      <button
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 btn btn-circle btn-sm bg-base-200"
+      >
+        <Users size={20} />
+      </button>
+
+      {/* Overlay untuk mobile */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      <aside
+        className={`
+          h-full bg-base-100 border-r border-base-300 flex flex-col transition-all duration-300
+          fixed lg:relative z-50 w-72
+          ${isMobileOpen ? "left-0" : "-left-72 lg:left-0"}
+        `}
+      >
+        {/* Header Sidebar */}
+        <div className="border-b border-base-300 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Users className="size-5" />
+              <span className="font-semibold">Contacts</span>
+            </div>
+            {/* Tombol close di mobile */}
+            <button onClick={() => setIsMobileOpen(false)} className="lg:hidden">
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-base-content/50" />
             <input
-              type="checkbox"
-              checked={showOnlineOnly}
-              onChange={(e) => setShowOnlineOnly(e.target.checked)}
-              className="checkbox checkbox-sm"
+              type="text"
+              placeholder="Cari anonymous ID atau nama..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="input input-bordered input-sm w-full pl-9"
             />
-            <span className="text-sm">Show online only</span>
-          </label>
-          <span className="text-xs text-zinc-500">({onlineUsers.length - 1} online)</span>
-        </div>
-      </div>
+          </div>
 
-      <div className="overflow-y-auto w-full py-3">
-        {filteredUsers.map((user) => (
-          <button
-            key={user._id}
-            onClick={() => setSelectedUser(user)}
-            className={`
-              w-full p-3 flex items-center gap-3
-              hover:bg-base-300 transition-colors
-              ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
-            `}
-          >
-            <div className="relative mx-auto lg:mx-0">
-              <img
-                src={user.profilePic || "/avatar.png"}
-                alt={user.displayName}
-                className="size-12 object-cover rounded-full"
+          {/* Filter online */}
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showOnlineOnly}
+                onChange={(e) => setShowOnlineOnly(e.target.checked)}
+                className="checkbox checkbox-xs"
               />
-              {onlineUsers.includes(user._id) && (
-                <span
-                  className="absolute bottom-0 right-0 size-3 bg-green-500 
-                  rounded-full ring-2 ring-zinc-900"
-                />
-              )}
-            </div>
+              <span>Online only</span>
+            </label>
+            <span className="text-xs text-base-content/50">
+              {onlineUsers.length - 1} online
+            </span>
+          </div>
+        </div>
 
-            {/* User info - only visible on larger screens */}
-            <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.fullName}</div>
-              <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-              </div>
-            </div>
-          </button>
-        ))}
-
-        {filteredUsers.length === 0 && (
-          <div className="text-center text-zinc-500 py-4">No online users</div>
-        )}
-      </div>
-    </aside>
+        {/* Daftar Kontak */}
+        <div className="flex-1 overflow-y-auto py-2">
+          {filteredUsers.length === 0 ? (
+            <div className="text-center text-base-content/50 py-8">Tidak ada kontak</div>
+          ) : (
+            filteredUsers.map((user) => (
+              <button
+                key={user._id}
+                onClick={() => handleSelectUser(user)}
+                className={`
+                  w-full p-3 flex items-center gap-3 hover:bg-base-200 transition-colors
+                  ${selectedUser?._id === user._id ? "bg-base-200 ring-1 ring-primary" : ""}
+                `}
+              >
+                <div className="relative flex-shrink-0">
+                  <img
+                    src={user.profilePic || "/avatar.png"}
+                    alt={user.displayName}
+                    className="size-12 rounded-full object-cover"
+                  />
+                  {onlineUsers.includes(user._id) && (
+                    <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-base-100" />
+                  )}
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <div className="font-medium truncate">{user.anonymousId}</div>
+                  <div className="text-sm text-base-content/70 truncate">{user.displayName}</div>
+                  <div className="text-xs text-base-content/50">
+                    {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                  </div>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </aside>
+    </>
   );
 };
+
 export default Sidebar;
