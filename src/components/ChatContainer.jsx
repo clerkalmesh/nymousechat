@@ -41,10 +41,10 @@ const ChatContainer = ({ isGlobalMode }) => {
 
   if (!selectedUser) {
     return (
-      <div className="flex-1 flex items-center justify-center text-base-content/50">
+      <div className="flex-1 flex items-center justify-center bg-gray-900">
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-2">💬 Pilih Kontak</h3>
-          <p>Atau buka Global Chat dari sidebar</p>
+          <h3 className="text-2xl font-bold text-pink-400 mb-2 font-mono">💬 Pilih Kontak</h3>
+          <p className="text-purple-300/70">Atau buka Global Chat dari sidebar</p>
         </div>
       </div>
     );
@@ -52,7 +52,7 @@ const ChatContainer = ({ isGlobalMode }) => {
 
   if (isMessagesLoading) {
     return (
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-gray-900">
         <ChatHeader />
         <MessageSkeleton />
         <MessageInput />
@@ -61,7 +61,7 @@ const ChatContainer = ({ isGlobalMode }) => {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full bg-gray-900">
       <ChatHeader />
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
@@ -71,7 +71,7 @@ const ChatContainer = ({ isGlobalMode }) => {
             ref={messageEndRef}
           >
             <div className="chat-image avatar">
-              <div className="size-8 rounded-full">
+              <div className="size-8 rounded-full border border-pink-500/50">
                 <img
                   src={
                     message.senderId === authUser._id
@@ -83,24 +83,26 @@ const ChatContainer = ({ isGlobalMode }) => {
               </div>
             </div>
             <div className="chat-header mb-1">
-              <time className="text-xs opacity-50">
+              <time className="text-xs text-pink-400/50">
                 {formatMessageTime(message.createdAt)}
               </time>
             </div>
             <div
-  className={`chat-bubble ${
-    message.senderId === authUser._id ? "chat-bubble-primary" : "chat-bubble-secondary"
-  }`}
->
-  {message.image && (
-    <img
-      src={message.image}
-      alt="attachment"
-      className="max-w-[200px] rounded-md mb-2"
-    />
-  )}
-  {message.text && <p className="break-words">{message.text}</p>}
-</div>
+              className={`chat-bubble ${
+                message.senderId === authUser._id 
+                  ? "bg-purple-600 text-white" 
+                  : "bg-pink-600 text-white"
+              }`}
+            >
+              {message.image && (
+                <img
+                  src={message.image}
+                  alt="attachment"
+                  className="max-w-[200px] rounded-md mb-2"
+                />
+              )}
+              {message.text && <p className="break-words">{message.text}</p>}
+            </div>
           </div>
         ))}
       </div>

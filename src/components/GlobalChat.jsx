@@ -27,14 +27,11 @@ const GlobalChat = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+      toast.error("Pilih file gambar yang valid");
       return;
     }
-
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
+    reader.onloadend = () => setImagePreview(reader.result);
     reader.readAsDataURL(file);
   };
 
@@ -57,26 +54,35 @@ const GlobalChat = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <div className="p-3 border-b border-base-300 bg-base-100">
-        <h3 className="font-semibold text-center">🌍 Global Chat</h3>
-        <p className="text-xs text-center text-base-content/50">Semua user online di sini</p>
+    <div className="flex-1 flex flex-col h-full bg-gray-900">
+      {/* Header Global Chat */}
+      <div className="p-3 border-b border-pink-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
+        <h3 className="font-semibold text-center text-pink-300">🌍 Global Chat</h3>
+        <p className="text-xs text-center text-purple-300/70">Semua user online di sini</p>
       </div>
 
+      {/* Daftar Pesan */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {globalMessages.map((msg) => (
           <div
             key={msg._id}
             className={`chat ${msg.senderId === authUser?._id ? "chat-end" : "chat-start"}`}
           >
-            <div className="chat-header text-xs opacity-70">
+            <div className="chat-image avatar">
+              <div className="size-8 rounded-full border border-pink-500/50">
+                {msg.senderId === authUser?._id ? (
+                  <img src={authUser.profilePic || "/avatar.png"} alt="avatar" />
+                ) : (
+                  <div className="bg-gradient-to-br from-purple-600 to-pink-600 size-8 rounded-full flex items-center justify-center text-white font-bold">
+                    {msg.senderName?.charAt(0) || "?"}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="chat-header text-xs text-pink-400/50">
               {msg.senderName} • {formatMessageTime(msg.createdAt)}
             </div>
-            <div
-              className={`chat-bubble ${
-                msg.senderId === authUser?._id ? "chat-bubble-primary" : "chat-bubble-secondary"
-              }`}
-            >
+            <div className="chat-bubble bg-pink-600 text-white">
               {msg.image && (
                 <img
                   src={msg.image}
@@ -91,18 +97,19 @@ const GlobalChat = () => {
         <div ref={messageEndRef} />
       </div>
 
-      <form onSubmit={handleSend} className="p-3 border-t border-base-300 bg-base-100 flex flex-col gap-2">
+      {/* Input Form */}
+      <form onSubmit={handleSend} className="p-3 border-t border-pink-500/30 bg-gray-900 flex flex-col gap-2">
         {imagePreview && (
           <div className="flex items-center gap-2">
             <div className="relative">
               <img
                 src={imagePreview}
                 alt="Preview"
-                className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
+                className="w-20 h-20 object-cover rounded-lg border border-pink-500"
               />
               <button
                 onClick={removeImage}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300 flex items-center justify-center"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-pink-600 text-white flex items-center justify-center"
                 type="button"
               >
                 <X className="size-3" />
@@ -116,7 +123,7 @@ const GlobalChat = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Ketik pesan global..."
-            className="input input-bordered flex-1 input-sm sm:input-md"
+            className="input input-bordered flex-1 bg-gray-800 border-pink-500/30 text-pink-200 placeholder-pink-700 font-mono"
           />
           <input
             type="file"
@@ -127,14 +134,14 @@ const GlobalChat = () => {
           />
           <button
             type="button"
-            className={`btn btn-circle btn-sm ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
+            className={`btn btn-circle ${imagePreview ? "text-pink-400" : "text-purple-400"}`}
             onClick={() => fileInputRef.current?.click()}
           >
             <Image size={18} />
           </button>
           <button
             type="submit"
-            className="btn btn-primary btn-sm btn-circle"
+            className="btn btn-circle bg-gradient-to-r from-purple-600 to-pink-600 border-0 text-white"
             disabled={!text.trim() && !imagePreview}
           >
             <Send size={18} />

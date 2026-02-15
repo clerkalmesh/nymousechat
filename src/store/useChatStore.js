@@ -11,9 +11,7 @@ export const useChatStore = create((set, get) => ({
   isMessagesLoading: false,
   globalMessages: [],
   isGlobalLoading: false,
-  mode: "private",
 
- 
   // Private chat
   getUsers: async () => {
     set({ isUsersLoading: true });
@@ -106,6 +104,4 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     if (socket) socket.off("newGlobalMessage");
   },
-
-  setMode: (mode) => set({ mode}), 
 }));

@@ -9,20 +9,20 @@ const HomePage = () => {
   const [isGlobalMode, setIsGlobalMode] = useState(false);
 
   return (
-    <div className="h-screen bg-base-200">
+    <div className="h-screen bg-gray-900">
       <div className="flex items-center justify-center pt-20 px-4">
-        <div className="bg-base-100 rounded-lg shadow-cl w-full max-w-6xl h-[calc(100vh-8rem)]">
+        <div className="bg-gray-800/80 border border-pink-500/40 rounded-xl shadow-2xl shadow-pink-500/30 w-full max-w-6xl h-[calc(100vh-8rem)] backdrop-blur-sm">
           <div className="flex h-full rounded-lg overflow-hidden">
             <Sidebar 
               isGlobalMode={isGlobalMode} 
               setIsGlobalMode={setIsGlobalMode} 
             />
             {isGlobalMode ? (
-              <ChatContainer isGlobalMode={isGlobalMode} />
+              <ChatContainer isGlobalMode={true} />
             ) : !selectedUser ? (
               <NoChatSelected />
             ) : (
-              <ChatContainer isGlobalMode={isGlobalMode} />
+              <ChatContainer isGlobalMode={false} />
             )}
           </div>
         </div>

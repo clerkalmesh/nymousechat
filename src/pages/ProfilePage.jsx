@@ -1,3 +1,4 @@
+
 // pages/ProfilePage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -89,9 +90,9 @@ const ProfilePage = () => {
                   <label
                     htmlFor="avatar-upload"
                     className={`
-                      absolute bottom-0 right-0 
+                      absolute bottom-0 right-0
                       bg-purple-600 hover:bg-purple-700 text-white
-                      p-2 rounded-full cursor-pointer 
+                      p-2 rounded-full cursor-pointer
                       transition-all duration-200 border border-pink-400
                       ${isUpdatingProfile ? 'animate-pulse pointer-events-none opacity-50' : ''}
                     `}
@@ -130,7 +131,7 @@ const ProfilePage = () => {
                     <span>ID ANONIM</span>
                   </div>
                   <div className="text-pink-300 font-mono text-base pl-6 break-all">
-                    {authUser?.anonymousId || 'MX-XXXXXX'}
+                    {authUser?.anonymousId || 'MESH-XXXXXX'}
                   </div>
                 </div>
 
@@ -141,7 +142,7 @@ const ProfilePage = () => {
                   </div>
                   <div className="text-pink-300 font-mono text-base pl-6">
                     {authUser?.createdAt
-                      ? new Date(authUser.createdAt).toLocaleDateString('id-ID', {
+                      ? new Date(authUser.createdAt).toLocaleDateString('en-EN', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
@@ -171,22 +172,22 @@ const ProfilePage = () => {
                   <span className="font-bold">TENTANG MEMESH NETWORK</span>
                   <span className="ml-auto">{showAbout ? '▼' : '▶'}</span>
                 </button>
-                
+
                 {showAbout && (
                   <div className="mt-3 text-sm text-purple-200/80 space-y-3 leading-relaxed">
                     <p>
-                      <span className="text-pink-400">Memesh Network</span> adalah platform komunikasi anonim yang 
-                      dirancang untuk melindungi privasi Anda. Tidak seperti aplikasi chat pada umumnya (WhatsApp, 
-                      Telegram, dll.) yang membutuhkan nomor telepon atau email, Memesh Network menggunakan sistem 
+                      <span className="text-pink-400">Memesh Network</span> adalah platform komunikasi anonim yang
+                      dirancang untuk melindungi privasi Anda. Tidak seperti aplikasi chat pada umumnya (WhatsApp,
+                      Telegram, dll.) yang membutuhkan nomor telepon atau email, Memesh Network menggunakan sistem
                       <span className="text-green-400"> Secret Key</span> yang dihasilkan secara acak.
                     </p>
                     <p>
                       <span className="text-yellow-400">❝ Tanpa data pribadi, tanpa risiko kebocoran. ❞</span>
                     </p>
                     <p>
-                      <strong className="text-pink-400">Apa itu Secret Key?</strong> Ini adalah kunci rahasia sepanjang 
-                      64 karakter heksadesimal yang hanya ditampilkan SATU KALI saat Anda membuat identitas. Kunci ini 
-                      tidak pernah disimpan di server (hanya hash-nya), sehingga hanya Anda yang tahu. Login dilakukan 
+                      <strong className="text-pink-400">Apa itu Secret Key?</strong> Ini adalah kunci rahasia sepanjang
+                      64 karakter heksadesimal yang hanya ditampilkan SATU KALI saat Anda membuat identitas. Kunci ini
+                      tidak pernah disimpan di server (hanya hash-nya), sehingga hanya Anda yang tahu. Login dilakukan
                       dengan mencocokkan hash, bukan kunci asli.
                     </p>
                     <p>
@@ -200,13 +201,13 @@ const ProfilePage = () => {
                       <li><span className="text-green-400">✓</span> Fitur global chat memungkinkan semua user online berkomunikasi tanpa batas.</li>
                     </ul>
                     <p>
-                      <strong className="text-pink-400">Mengapa ada Global Chat?</strong> Untuk menciptakan ruang 
-                      bersama di mana semua pengguna dapat berinteraksi secara anonim, berbagi ide, atau sekadar 
+                      <strong className="text-pink-400">Mengapa ada Global Chat?</strong> Untuk menciptakan ruang
+                      bersama di mana semua pengguna dapat berinteraksi secara anonim, berbagi ide, atau sekadar
                       bersosialisasi tanpa batasan. Ini seperti ruang publik digital yang aman.
                     </p>
                     <p>
-                      <strong className="text-pink-400">Filosofi kami:</strong> Privasi adalah hak asasi. Anda 
-                      berhak berkomunikasi tanpa diawasi, tanpa data dijual ke pihak ketiga. Memesh Network hadir 
+                      <strong className="text-pink-400">Filosofi kami:</strong> Privasi adalah hak asasi. Anda
+                      berhak berkomunikasi tanpa diawasi, tanpa data dijual ke pihak ketiga. Memesh Network hadir
                       sebagai alternatif bagi mereka yang menghargai kebebasan dan anonimitas.
                     </p>
                   </div>
@@ -270,7 +271,7 @@ const ProfilePage = () => {
           <div className="p-4 text-sm space-y-3 max-h-96 overflow-y-auto text-purple-200/80">
             <h3 className="text-lg font-bold text-pink-400">KEBIJAKAN PRIVASI</h3>
             <p>
-              <span className="text-pink-300">Memesh Network</span> berkomitmen melindungi privasi Anda. 
+              <span className="text-pink-300">Memesh Network</span> berkomitmen melindungi privasi Anda.
               Berikut adalah praktik pengumpulan dan penggunaan data:
             </p>
 
@@ -284,26 +285,26 @@ const ProfilePage = () => {
 
             <h4 className="text-pink-300 font-bold mt-3">2. Penggunaan Data</h4>
             <p>
-              Data hanya digunakan untuk operasional chat. Tidak ada data yang dijual atau dibagikan 
+              Data hanya digunakan untuk operasional chat. Tidak ada data yang dijual atau dibagikan
               kepada pihak ketiga. Pesan hanya dapat diakses oleh pengirim dan penerima yang dituju.
             </p>
 
             <h4 className="text-pink-300 font-bold mt-3">3. Keamanan Secret Key</h4>
             <p>
-              Secret key Anda hanya ditampilkan sekali saat pembuatan akun. Jika hilang, tidak ada cara 
-              untuk memulihkan akun. Simpan di tempat aman (password manager, catatan offline). 
+              Secret key Anda hanya ditampilkan sekali saat pembuatan akun. Jika hilang, tidak ada cara
+              untuk memulihkan akun. Simpan di tempat aman (password manager, catatan offline).
               Jangan pernah bagikan secret key Anda.
             </p>
 
             <h4 className="text-pink-300 font-bold mt-3">4. Cookie</h4>
             <p>
-              Kami menggunakan cookie httpOnly untuk token autentikasi. Cookie ini tidak bisa diakses 
+              Kami menggunakan cookie httpOnly untuk token autentikasi. Cookie ini tidak bisa diakses
               oleh JavaScript dan hanya dikirim melalui HTTPS.
             </p>
 
             <h4 className="text-pink-300 font-bold mt-3">5. Hak Anda</h4>
             <p>
-              Anda dapat menghapus akun kapan saja melalui fitur dukungan (dalam pengembangan). 
+              Anda dapat menghapus akun kapan saja melalui fitur dukungan (dalam pengembangan).
               Semua data terkait akan dihapus permanen.
             </p>
 
