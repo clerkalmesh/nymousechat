@@ -21,28 +21,23 @@ const App = () => {
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+  }, []);
 
-  console.log({ authUser });
-
-  if (isCheckingAuth && !authUser)
-    return (
-      <div className="flex items-center justify-center h-screen">
-      <h3 className="text-bold text-red-500">loading yeey</h3>
-        <Loader className="size-10 animate-spin" />
-      </div>
-    );
 
   return (
     <div data-theme={theme}>
-      
+      {isCheckingAuth && (
+          <div className="flex items-center justify-center h-screen">
+      <h3 className="text-bold text-red-500 text-4xl">loading yeey</h3>
+        <Loader className="size-10 animate-spin" />
+      </div>
+      )}
 
       <Routes>
         <Route path="/" element={<ProtocolBootLoader/>} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/home" />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+        
       </Routes>
 
       <Toaster />
@@ -50,3 +45,4 @@ const App = () => {
   );
 };
 export default App;
+
