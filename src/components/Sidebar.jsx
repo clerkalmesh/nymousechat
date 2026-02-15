@@ -23,7 +23,6 @@ const Sidebar = () => {
     );
 
   const handleSelectUser = (user) => {
-    setMode("private");
     setSelectedUser(user);
     if (window.innerWidth < 1024) setIsMobileOpen(false);
   };
@@ -116,7 +115,6 @@ const Sidebar = () => {
           </div>
         </button>
 
-        {/* Daftar Kontak */}
         <div className="flex-1 overflow-y-auto py-2">
           {filteredUsers.length === 0 ? (
             <div className="text-center text-base-content/50 py-8">Tidak ada kontak</div>

@@ -42,7 +42,7 @@ const ChatContainer = () => {
 
   if (!selectedUser) {
     return (
-      <div className="flex-1 flex items-center justify-center text-base-content/50 bg-base-100">
+      <div className="flex-1 flex items-center justify-center text-base-content/50">
         <div className="text-center">
           <h3 className="text-2xl font-bold mb-2">💬 Pilih Kontak</h3>
           <p>Atau buka Global Chat dari sidebar</p>
@@ -62,7 +62,7 @@ const ChatContainer = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-base-100">
+    <div className="flex-1 flex flex-col h-full">
       <ChatHeader />
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
