@@ -7,7 +7,6 @@ const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const textareaRef = useRef(null);
   const { sendMessage } = useChatStore();
 
   const handleImageChange = (e) => {
@@ -16,8 +15,11 @@ const MessageInput = () => {
       toast.error("Please select an image file");
       return;
     }
+
     const reader = new FileReader();
-    reader.onloadend = () => setImagePreview(reader.result);
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
     reader.readAsDataURL(file);
   };
 
@@ -26,33 +28,22 @@ const MessageInput = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
     if (!text.trim() && !imagePreview) return;
+
     try {
-      await sendMessage({ text: text.trim(), image: imagePreview });
+      await sendMessage({
+        text: text.trim(),
+        image: imagePreview,
+      });
+
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
     } catch (error) {
       console.error("Failed to send message:", error);
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const handleTextChange = (e) => {
-    setText(e.target.value);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      toast.error("Gagal mengirim pesan");
     }
   };
 
@@ -77,22 +68,14 @@ const MessageInput = () => {
         </div>
       )}
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSendMessage();
-        }}
-        className="flex items-end gap-2"
-      >
-        <div className="flex-1 flex items-end gap-2">
-          <textarea
-            ref={textareaRef}
-            value={text}
-            onChange={handleTextChange}
-            onKeyDown={handleKeyDown}
+      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+        <div className="flex-1 flex gap-2">
+          <input
+            type="text"
+            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
-            className="textarea textarea-bordered flex-1 py-2 px-3 min-h-[40px] max-h-32 resize-none"
-            rows={1}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           />
           <input
             type="file"
@@ -101,6 +84,7 @@ const MessageInput = () => {
             ref={fileInputRef}
             onChange={handleImageChange}
           />
+
           <button
             type="button"
             className={`btn btn-circle btn-sm ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}

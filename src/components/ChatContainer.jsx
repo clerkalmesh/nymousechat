@@ -87,16 +87,20 @@ const ChatContainer = ({ isGlobalMode }) => {
                 {formatMessageTime(message.createdAt)}
               </time>
             </div>
-            <div className="chat-bubble">
-              {message.image && (
-                <img
-                  src={message.image}
-                  alt="attachment"
-                  className="max-w-[200px] rounded-md mb-2"
-                />
-              )}
-              {message.text && <p>{message.text}</p>}
-            </div>
+            <div
+  className={`chat-bubble ${
+    message.senderId === authUser._id ? "chat-bubble-primary" : "chat-bubble-secondary"
+  }`}
+>
+  {message.image && (
+    <img
+      src={message.image}
+      alt="attachment"
+      className="max-w-[200px] rounded-md mb-2"
+    />
+  )}
+  {message.text && <p className="break-words">{message.text}</p>}
+</div>
           </div>
         ))}
       </div>
@@ -105,4 +109,4 @@ const ChatContainer = ({ isGlobalMode }) => {
   );
 };
 
-export default ChatContainer;
+export default ChatContainer;.
