@@ -94,25 +94,16 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  updateDisplayName: async (displayName) => {
+  updateProfile: async (profilePic) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.put("/auth/update-profile", { displayName });
-
-      // Update juga signupData jika ada
-      const currentSignup = get().signupData;
-      set({
-        authUser: res.data,
-        signupData: currentSignup
-          ? { ...currentSignup, displayName: res.data.displayName }
-          : null,
-      });
-
-      toast.success("Display name diperbarui");
+      const res = await axiosInstance.put("/auth/update-profile", { profilePic });
+      set({ authUser: res.data });
+      toast.success("Foto profil diperbarui");
       return res.data;
     } catch (error) {
-      console.error("Update display name error:", error);
-      toast.error(error.response?.data?.message || "Gagal memperbarui nama");
+      console.error("Update profile pic error:", error);
+      toast.error(error.response?.data?.message || "Gagal memperbarui foto profil");
       throw error;
     } finally {
       set({ isUpdatingProfile: false });
