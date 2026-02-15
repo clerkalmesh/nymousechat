@@ -11,6 +11,9 @@ export const useChatStore = create((set, get) => ({
   isMessagesLoading: false,
   globalMessages: [],
   isGlobalLoading: false,
+  mode: "private",
+
+ setMode:(mode) => set({ mode }),
 
   // Private chat
   getUsers: async () => {

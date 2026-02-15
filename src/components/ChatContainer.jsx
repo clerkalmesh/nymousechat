@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
@@ -8,7 +8,6 @@ import { formatMessageTime } from "../lib/utils";
 import GlobalChat from "./GlobalChat";
 
 const ChatContainer = () => {
-  const [mode, setMode] = useState("private"); // "private" atau "global"
   const {
     messages,
     getMessages,
@@ -16,6 +15,7 @@ const ChatContainer = () => {
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
+    mode,
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
@@ -42,13 +42,10 @@ const ChatContainer = () => {
 
   if (!selectedUser) {
     return (
-      <div className="flex-1 flex items-center justify-center text-base-content/50">
+      <div className="flex-1 flex items-center justify-center text-base-content/50 bg-base-100">
         <div className="text-center">
           <h3 className="text-2xl font-bold mb-2">💬 Pilih Kontak</h3>
-          <p>Atau coba fitur Global Chat</p>
-          <button onClick={() => setMode("global")} className="btn btn-primary btn-sm mt-4">
-            Buka Global Chat
-          </button>
+          <p>Atau buka Global Chat dari sidebar</p>
         </div>
       </div>
     );
@@ -65,25 +62,8 @@ const ChatContainer = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      {/* Tab selector */}
-      <div className="tabs tabs-boxed justify-center p-1 bg-base-200 mx-2 mt-2 rounded-lg">
-        <button
-          className={`tab tab-sm ${mode === "private" ? "tab-active" : ""}`}
-          onClick={() => setMode("private")}
-        >
-          Private
-        </button>
-        <button
-          className={`tab tab-sm ${mode === "global" ? "tab-active" : ""}`}
-          onClick={() => setMode("global")}
-        >
-          Global
-        </button>
-      </div>
-
+    <div className="flex-1 flex flex-col h-full bg-base-100">
       <ChatHeader />
-
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
@@ -121,7 +101,6 @@ const ChatContainer = () => {
           </div>
         ))}
       </div>
-
       <MessageInput />
     </div>
   );

@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import useAuthStore from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users, Search, X } from "lucide-react";
+import { Users, Search, X, Globe } from "lucide-react";
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
+  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading, setMode, mode } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,7 +15,6 @@ const Sidebar = () => {
     getUsers();
   }, [getUsers]);
 
-  // Filter berdasarkan online status dan search
   const filteredUsers = users
     .filter((user) => (showOnlineOnly ? onlineUsers.includes(user._id) : true))
     .filter((user) =>
@@ -24,18 +23,21 @@ const Sidebar = () => {
     );
 
   const handleSelectUser = (user) => {
+    setMode("private");
     setSelectedUser(user);
-    // Di mobile, tutup sidebar setelah pilih user
-    if (window.innerWidth < 1024) {
-      setIsMobileOpen(false);
-    }
+    if (window.innerWidth < 1024) setIsMobileOpen(false);
+  };
+
+  const handleSelectGlobal = () => {
+    setMode("global");
+    setSelectedUser(null);
+    if (window.innerWidth < 1024) setIsMobileOpen(false);
   };
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
   return (
     <>
-      {/* Tombol hamburger untuk mobile */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 btn btn-circle btn-sm bg-base-200"
@@ -43,7 +45,6 @@ const Sidebar = () => {
         <Users size={20} />
       </button>
 
-      {/* Overlay untuk mobile */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -58,20 +59,17 @@ const Sidebar = () => {
           ${isMobileOpen ? "left-0" : "-left-72 lg:left-0"}
         `}
       >
-        {/* Header Sidebar */}
         <div className="border-b border-base-300 p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Users className="size-5" />
-              <span className="font-semibold">Contacts</span>
+              <span className="font-semibold">Chats</span>
             </div>
-            {/* Tombol close di mobile */}
             <button onClick={() => setIsMobileOpen(false)} className="lg:hidden">
               <X size={20} />
             </button>
           </div>
 
-          {/* Search Input */}
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-base-content/50" />
             <input
@@ -83,7 +81,6 @@ const Sidebar = () => {
             />
           </div>
 
-          {/* Filter online */}
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -99,6 +96,25 @@ const Sidebar = () => {
             </span>
           </div>
         </div>
+
+        {/* Global Chat Item */}
+        <button
+          onClick={handleSelectGlobal}
+          className={`
+            w-full p-3 flex items-center gap-3 hover:bg-base-200 transition-colors border-b border-base-200
+            ${mode === "global" ? "bg-base-200 ring-1 ring-primary" : ""}
+          `}
+        >
+          <div className="relative flex-shrink-0">
+            <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center">
+              <Globe className="size-6 text-primary" />
+            </div>
+          </div>
+          <div className="flex-1 text-left min-w-0">
+            <div className="font-medium">🌍 Global Chat</div>
+            <div className="text-sm text-base-content/70">Semua user online</div>
+          </div>
+        </button>
 
         {/* Daftar Kontak */}
         <div className="flex-1 overflow-y-auto py-2">
