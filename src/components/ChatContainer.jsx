@@ -109,4 +109,4 @@ const ChatContainer = ({ isGlobalMode }) => {
   );
 };
 
-export default ChatContainer;.
+export default ChatContainer;
