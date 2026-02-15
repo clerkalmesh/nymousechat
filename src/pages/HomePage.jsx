@@ -1,34 +1,24 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../store/useAuthStore';
+import useChatStore from "../store/useChatStore";
+
+import Sidebar from "../components/Sidebar";
+import NoChatSelected from "../components/NoChatSelected";
+import ChatContainer from "../components/ChatContainer";
 
 const HomePage = () => {
-  const { authUser, logout } = useAuthStore();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
+  const { selectedUser } = useChatStore();
 
   return (
-    <div className="min-h-screen bg-base-300 flex items-center justify-center p-4">
-      <div className="card w-full max-w-md bg-base-100 shadow-xl border border-success">
-        <div className="card-body text-center">
-          <h2 className="card-title text-3xl justify-center text-success">✓ ACCESS GRANTED</h2>
-          <div className="space-y-2">
-            <p>Anonymous ID: <span className="font-bold text-primary">{authUser?.anonymousId}</span></p>
-            <p>Display Name: <span className="text-secondary">{authUser?.displayName}</span></p>
-          </div>
-          <div className="card-actions justify-center mt-4">
-            <button onClick={handleLogout} className="btn btn-outline btn-warning">
-              Logout
-            </button>
+    <div className="h-screen bg-base-200">
+      <div className="flex items-center justify-center pt-20 px-4">
+        <div className="bg-base-100 rounded-lg shadow-cl w-full max-w-6xl h-[calc(100vh-8rem)]">
+          <div className="flex h-full rounded-lg overflow-hidden">
+            <Sidebar />
+
+            {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
           </div>
         </div>
       </div>
     </div>
   );
 };
-
 export default HomePage;

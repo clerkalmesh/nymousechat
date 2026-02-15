@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const introLines = [
   "memesh://init",
   "secure runtime engaged",
   "",
-  "Ketik ENTER to access memesh protocols",
+  "type ENTER to access memesh protocols",
 ];
 
 const updateLines = [
@@ -44,8 +45,10 @@ const philosophyLines = [
   "> entering memesh interface...",
 ];
 
-export default function ProtocolBootLoader({ onComplete }) {
+export default function ProtocolBootLoader() {
+  const navigate = useNavigate();
   const inputRef = useRef(null);
+
   const [lines, setLines] = useState([]);
   const [input, setInput] = useState("");
   const [stage, setStage] = useState("intro");
@@ -53,14 +56,16 @@ export default function ProtocolBootLoader({ onComplete }) {
 
   const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // ================= AUTOFOCUS
+  // ================= MUSIC CONTROL
+
+  // ================= AUTOFOCUS (CRITICAL FOR MOBILE)
   useEffect(() => {
     if (stage === "intro") {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [stage]);
 
-  // ================= TYPE EFFECT
+  // ================= REALISTIC TYPING
   const typeLine = async (text, speed = 16) => {
     let buffer = "";
     setLines((prev) => [...prev, ""]);
@@ -89,15 +94,20 @@ export default function ProtocolBootLoader({ onComplete }) {
         await delay(140);
       }
     };
+
     run();
   }, [stage]);
 
-  // ================= INPUT HANDLER
+  // ================= INPUT HANDLER (WORKS EVERYWHERE)
   const handleKeyDown = (e) => {
     if (stage !== "intro") return;
-    if (e.key === "Enter" && input.trim().toUpperCase() === "ENTER") {
-      setStage("update");
-      setInput("");
+
+    if (e.key === "Enter") {
+      if (input.trim().toUpperCase() === "ENTER") {
+        audioManager.play("enter");
+        setStage("update");
+        setInput("");
+      }
     }
   };
 
@@ -144,13 +154,12 @@ export default function ProtocolBootLoader({ onComplete }) {
       }
 
       await delay(700);
-      if (onComplete) onComplete(); // selesai boot, kasih tau wrapper
+      navigate("/login");
     };
 
     run();
-  }, [stage, onComplete]);
+  }, [stage]);
 
-  // ================= PROGRESS BAR
   const renderBar = () => {
     const total = 26;
     const filled = Math.round((progress / 100) * total);
@@ -160,25 +169,42 @@ export default function ProtocolBootLoader({ onComplete }) {
   return (
     <div className="h-screen bg-black text-purple-300 font-mono">
       <div className="h-full w-full flex items-center justify-center">
-        <div className="w-full max-w-4xl mx-3 sm:mx-6 p-5 sm:p-8 text-base sm:text-lg bg-black/80 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_80px_rgba(168,85,247,0.35)] rounded-xl relative">
 
+        <div
+          className="
+            w-full max-w-4xl
+            mx-3 sm:mx-6
+            p-5 sm:p-8
+            text-base sm:text-lg
+            bg-black/80 backdrop-blur-xl
+            border border-purple-500/30
+            shadow-[0_0_80px_rgba(168,85,247,0.35)]
+            rounded-xl
+            relative
+          "
+        >
           {/* HEADER */}
           <div className="flex items-center gap-2 mb-6 opacity-40 text-xs sm:text-sm">
             <div className="w-2 h-2 rounded-full bg-red-500" />
             <div className="w-2 h-2 rounded-full bg-yellow-500" />
             <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="ml-2 tracking-widest">memesh_runtime v3.1</span>
+            <span className="ml-2 tracking-widest">
+              memesh_runtime v3.1
+            </span>
           </div>
 
           {/* TERMINAL */}
           <div className="space-y-2 leading-relaxed">
             {lines.map((line, idx) => (
-              <div key={idx} className="opacity-80">{line}</div>
+              <div key={idx} className="opacity-80">
+                {line}
+              </div>
             ))}
 
             {stage === "intro" && (
               <div className="mt-4 flex items-center">
                 <span className="text-purple-500 mr-2">&gt;</span>
+
                 <input
                   ref={inputRef}
                   value={input}
@@ -187,8 +213,15 @@ export default function ProtocolBootLoader({ onComplete }) {
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck={false}
-                  className="bg-transparent outline-none w-full text-purple-200 caret-purple-400"
+                  className="
+                    bg-transparent
+                    outline-none
+                    w-full
+                    text-purple-200
+                    caret-purple-400
+                  "
                 />
+
                 <span className="animate-pulse text-purple-400">█</span>
               </div>
             )}
@@ -202,8 +235,11 @@ export default function ProtocolBootLoader({ onComplete }) {
           </div>
 
           {/* SCANLINES */}
-          <div className="pointer-events-none absolute inset-0 opacity-[0.035] bg-[linear-gradient(to_bottom,white,transparent_2px)] bg-[length:100%_4px]" />
+          <div className="pointer-events-none absolute inset-0 opacity-[0.035]
+            bg-[linear-gradient(to_bottom,white,transparent_2px)]
+            bg-[length:100%_4px]" />
         </div>
+
       </div>
     </div>
   );
