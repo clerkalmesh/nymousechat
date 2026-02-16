@@ -7,6 +7,7 @@ const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+  const textareaRef = useRef(null);
   const { sendMessage } = useChatStore();
 
   const handleImageChange = (e) => {
@@ -25,18 +26,27 @@ const MessageInput = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
+  const handleSendMessage = async () => {
     if (!text.trim() && !imagePreview) return;
-
     try {
       await sendMessage({ text: text.trim(), image: imagePreview });
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
     } catch (error) {
       console.error("Gagal mengirim pesan:", error);
       toast.error("Gagal mengirim pesan");
+    }
+  };
+
+  const handleTextChange = (e) => {
+    setText(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
 
@@ -61,14 +71,15 @@ const MessageInput = () => {
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-        <div className="flex-1 flex gap-2">
-          <input
-            type="text"
-            className="w-full input input-bordered bg-gray-800 border-pink-500/30 text-pink-200 placeholder-pink-700 font-mono"
-            placeholder="Ketik pesan..."
+      <form onSubmit={(e) => e.preventDefault()} className="flex items-end gap-2">
+        <div className="flex-1 flex items-end gap-2">
+          <textarea
+            ref={textareaRef}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
+            placeholder="Ketik pesan..."
+            className="w-full textarea textarea-bordered bg-gray-800 border-pink-500/30 text-pink-200 placeholder-pink-700 font-mono resize-none min-h-[40px] max-h-32"
+            rows={1}
           />
           <input
             type="file"
@@ -86,8 +97,9 @@ const MessageInput = () => {
           </button>
         </div>
         <button
-          type="submit"
+          type="button"
           className="btn btn-circle bg-gradient-to-r from-purple-600 to-pink-600 border-0 text-white"
+          onClick={handleSendMessage}
           disabled={!text.trim() && !imagePreview}
         >
           <Send size={22} />

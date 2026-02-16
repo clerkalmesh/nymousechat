@@ -83,7 +83,7 @@ const ChatArea = ({ isGlobalMode, setSidebarOpen }) => {
             <div
               className={`chat-bubble ${
                 message.senderId === authUser._id
-                  ? "bg-purple-600 text-white"
+                  ? "bg-cyan-600 text-white"
                   : "bg-pink-600 text-white"
               }`}
             >

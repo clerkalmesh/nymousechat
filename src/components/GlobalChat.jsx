@@ -13,6 +13,7 @@ const GlobalChat = ({ setSidebarOpen }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
   const messageEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     getGlobalMessages();
@@ -40,16 +41,26 @@ const GlobalChat = ({ setSidebarOpen }) => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSend = async (e) => {
-    e.preventDefault();
+  const handleSend = async () => {
     if (!text.trim() && !imagePreview) return;
     try {
       await sendGlobalMessage({ text: text.trim(), image: imagePreview });
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
     } catch (error) {
       toast.error("Gagal mengirim pesan global");
+    }
+  };
+
+  const handleTextChange = (e) => {
+    setText(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
 
@@ -67,7 +78,7 @@ const GlobalChat = ({ setSidebarOpen }) => {
           <h3 className="font-semibold text-pink-300">🌍 Global Chat</h3>
           <p className="text-xs text-purple-300/70">Semua Anonymous online di sini</p>
         </div>
-        <div className="w-8 lg:hidden" /> {/* spacer untuk keseimbangan di mobile */}
+        <div className="w-8 lg:hidden" />
       </div>
 
       {/* Daftar Pesan Global */}
@@ -89,15 +100,15 @@ const GlobalChat = ({ setSidebarOpen }) => {
                 </div>
               </div>
               <div className="chat-header text-xs text-pink-400/50 flex items-center gap-1 flex-wrap">
-                <span className="font-mono">{msg.senderName || "Anonymous"}</span>
+                <span className="font-mono text-red-500">{msg.senderName || "Anonymous"}</span>
                 <span>•</span>
-                <span className="font-mono">{msg.senderAnonymousId || "??????"}</span>
+                <span className="font-mono text-green-600">{msg.senderAnonymousId || "??????"}</span>
                 <span>•</span>
                 <time>{formatMessageTime(msg.createdAt)}</time>
               </div>
               <div
                 className={`chat-bubble ${
-                  isOwn ? "bg-purple-600 text-white" : "bg-pink-600 text-white"
+                  isOwn ? "bg-cyan-600 text-white" : "bg-pink-600 text-white"
                 }`}
               >
                 {msg.image && (
@@ -116,7 +127,7 @@ const GlobalChat = ({ setSidebarOpen }) => {
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSend} className="p-3 border-t border-pink-500/30 bg-gray-900 flex flex-col gap-2">
+      <form onSubmit={(e) => e.preventDefault()} className="p-3 border-t border-pink-500/30 bg-gray-900 flex flex-col gap-2">
         {imagePreview && (
           <div className="flex items-center gap-2">
             <div className="relative">
@@ -135,13 +146,14 @@ const GlobalChat = ({ setSidebarOpen }) => {
             </div>
           </div>
         )}
-        <div className="flex gap-2">
-          <input
-            type="text"
+        <div className="flex gap-2 items-end">
+          <textarea
+            ref={textareaRef}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
             placeholder="Ketik pesan global..."
-            className="input input-bordered flex-1 bg-gray-800 border-pink-500/30 text-pink-200 placeholder-pink-700 font-mono"
+            className="textarea textarea-bordered flex-1 bg-gray-800 border-pink-500/30 text-pink-200 placeholder-pink-700 font-mono resize-none min-h-[40px] max-h-32"
+            rows={1}
           />
           <input
             type="file"
@@ -158,8 +170,9 @@ const GlobalChat = ({ setSidebarOpen }) => {
             <Image size={18} />
           </button>
           <button
-            type="submit"
+            type="button"
             className="btn btn-circle bg-gradient-to-r from-purple-600 to-pink-600 border-0 text-white"
+            onClick={handleSend}
             disabled={!text.trim() && !imagePreview}
           >
             <Send size={18} />
