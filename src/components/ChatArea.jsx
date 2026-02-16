@@ -36,7 +36,7 @@ const ChatArea = ({ isGlobalMode, setSidebarOpen }) => {
   }, [messages, isGlobalMode]);
 
   if (isGlobalMode) {
-    return <GlobalChat />;
+    return <GlobalChat setSidebarOpen={setSidebarOpen} />;
   }
 
   if (!selectedUser) {

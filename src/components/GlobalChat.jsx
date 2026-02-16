@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import useAuthStore from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
-import { Send, Image, X, ArrowLeft } from "lucide-react";
+import { Send, Image, X, Menu } from "lucide-react";
 import toast from "react-hot-toast";
 
-const GlobalChat = ({ onBack }) => {
+const GlobalChat = ({ setSidebarOpen }) => {
   const { globalMessages, getGlobalMessages, sendGlobalMessage, subscribeToGlobal, unsubscribeFromGlobal } =
     useChatStore();
   const { authUser } = useAuthStore();
@@ -55,19 +55,19 @@ const GlobalChat = ({ onBack }) => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-900">
-      {/* Header Global Chat dengan tombol back */}
+      {/* Header Global Chat dengan tombol menu */}
       <div className="p-3 border-b border-pink-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex items-center gap-2">
         <button
-          onClick={onBack}
-          className="btn btn-ghost btn-sm btn-circle text-pink-300 hover:bg-pink-500/20"
+          onClick={() => setSidebarOpen(true)}
+          className="lg:hidden btn btn-ghost btn-sm btn-circle text-pink-300 hover:bg-pink-500/20"
         >
-          <ArrowLeft size={20} />
+          <Menu size={18} />
         </button>
-        <div className="flex-1">
-          <h3 className="font-semibold text-center text-pink-300">🌍 Global Chat</h3>
-          <p className="text-xs text-center text-purple-300/70">Semua Anonymous online di sini</p>
+        <div className="flex-1 text-center">
+          <h3 className="font-semibold text-pink-300">🌍 Global Chat</h3>
+          <p className="text-xs text-purple-300/70">Semua Anonymous online di sini</p>
         </div>
-        <div className="w-8" />
+        <div className="w-8 lg:hidden" /> {/* spacer untuk keseimbangan di mobile */}
       </div>
 
       {/* Daftar Pesan Global */}
@@ -97,7 +97,7 @@ const GlobalChat = ({ onBack }) => {
               </div>
               <div
                 className={`chat-bubble ${
-                  isOwn ? "bg-cyan-600 text-white" : "bg-pink-600 text-white"
+                  isOwn ? "bg-purple-600 text-white" : "bg-pink-600 text-white"
                 }`}
               >
                 {msg.image && (
