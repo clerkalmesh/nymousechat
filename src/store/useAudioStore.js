@@ -3,8 +3,9 @@ import { create } from "zustand";
 export const useAudioStore = create((set, get) => ({
   audio: null,
   isPlaying: false,
-  isMuted: true, // default mute agar autoplay tidak bermasalah
+  isMuted: true,
   volume: 0.5,
+  hasUserInteracted: false, // menandai apakah user pernah mengubah mute
 
   initAudio: (src) => {
     if (get().audio) return;
@@ -23,10 +24,13 @@ export const useAudioStore = create((set, get) => ({
   },
 
   play: () => {
-    const { audio } = get();
+    const { audio, hasUserInteracted, isMuted } = get();
     if (audio) {
-      // Jika ingin langsung terdengar, unmute sebelum play
-      // audio.muted = false;
+      // Jika pertama kali play dan masih mute, unmute otomatis agar bersuara
+      if (!hasUserInteracted && isMuted) {
+        audio.muted = false;
+        set({ isMuted: false, hasUserInteracted: true });
+      }
       audio.play().catch((e) => console.log("Play gagal", e));
     }
   },
@@ -46,7 +50,7 @@ export const useAudioStore = create((set, get) => ({
     const { audio, isMuted } = get();
     if (audio) {
       audio.muted = !isMuted;
-      set({ isMuted: !isMuted });
+      set({ isMuted: !isMuted, hasUserInteracted: true });
     }
   },
 
