@@ -1,5 +1,5 @@
 import Navbar from "./components/Navbar";
-
+import { useAudioStore } from "./store/useAudioStore";
 import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
@@ -17,6 +17,15 @@ import { Toaster } from "react-hot-toast";
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { theme } = useThemeStore();
+  const { initAudio, play } = useAudioStore();
+
+  useEffect(() => {
+    // Inisialisasi audio (pastikan file ada di public/music/background.mp3)
+    initAudio("/auth.mp3");
+    // Coba autoplay (akan mute dulu)
+    play();
+  }, []);
+
 
   console.log({ onlineUsers });
 

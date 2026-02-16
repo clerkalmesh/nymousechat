@@ -1,43 +1,9 @@
-import { MessageSquare, Menu, Play, Pause, Volume2, VolumeX } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { MessageSquare, Menu } from "lucide-react";
+import useAuthStore from "../store/useAuthStore";
+import AudioControls from "../components/AudioControls";
 
 const NoChatSelected = ({ setSidebarOpen }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    // Inisialisasi audio (ganti URL dengan file musik yang Anda miliki)
-    // Contoh: jika file berada di public/music/background.mp3
-    audioRef.current = new Audio("/auth.mp3");
-    audioRef.current.loop = true; // putar terus sampai di-stop
-
-    // Cleanup saat komponen dilepas
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play().catch((e) => console.log("Gagal memutar musik", e));
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
+  const { authUser } = useAuthStore();
 
   return (
     <div className="flex-1 flex items-center justify-center bg-gray-900 relative">
@@ -49,23 +15,12 @@ const NoChatSelected = ({ setSidebarOpen }) => {
         <Menu size={20} />
       </button>
 
-      {/* Kontrol musik di pojok kanan bawah */}
-      <div className="absolute bottom-4 right-4 flex gap-2 z-10">
-        <button
-          onClick={togglePlay}
-          className="btn btn-circle btn-sm bg-purple-900/50 border-pink-500 text-pink-300 hover:bg-purple-800/70"
-          title={isPlaying ? "Jeda musik" : "Putar musik"}
-        >
-          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-        </button>
-        <button
-          onClick={toggleMute}
-          className="btn btn-circle btn-sm bg-purple-900/50 border-pink-500 text-pink-300 hover:bg-purple-800/70"
-          title={isMuted ? "Suarakan" : "Bisu"}
-        >
-          {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-        </button>
-      </div>
+      {/* Kontrol musik hanya muncul jika user sudah login */}
+      {authUser && (
+        <div className="absolute bottom-4 right-4 z-10">
+          <AudioControls />
+        </div>
+      )}
 
       <div className="max-w-md text-center space-y-6 p-8">
         <div className="flex justify-center mb-4">
