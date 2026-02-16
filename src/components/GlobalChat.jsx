@@ -55,13 +55,11 @@ const GlobalChat = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-900">
-      {/* Header Global Chat */}
       <div className="p-3 border-b border-pink-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
         <h3 className="font-semibold text-center text-pink-300">🌍 Global Chat</h3>
         <p className="text-xs text-center text-purple-300/70">Semua user online di sini</p>
       </div>
 
-      {/* Daftar Pesan */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {globalMessages.map((msg) => (
           <div
@@ -97,7 +95,6 @@ const GlobalChat = () => {
         <div ref={messageEndRef} />
       </div>
 
-      {/* Input Form */}
       <form onSubmit={handleSend} className="p-3 border-t border-pink-500/30 bg-gray-900 flex flex-col gap-2">
         {imagePreview && (
           <div className="flex items-center gap-2">

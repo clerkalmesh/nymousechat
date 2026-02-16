@@ -7,7 +7,7 @@ import useAuthStore from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
 import GlobalChat from "./GlobalChat";
 
-const ChatContainer = ({ isGlobalMode }) => {
+const ChatArea = ({ isGlobalMode, setSidebarOpen }) => {
   const {
     messages,
     getMessages,
@@ -40,20 +40,13 @@ const ChatContainer = ({ isGlobalMode }) => {
   }
 
   if (!selectedUser) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-gray-900">
-        <div className="text-center p-4">
-          <h3 className="text-2xl font-bold text-pink-400 mb-2 font-mono">💬 Pilih Kontak</h3>
-          <p className="text-purple-300/70">Atau buka Global Chat dari sidebar</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   if (isMessagesLoading) {
     return (
-      <div className="flex-1 flex flex-col bg-gray-900">
-        <ChatHeader />
+      <div className="flex-1 flex flex-col h-full bg-gray-900">
+        <ChatHeader setSidebarOpen={setSidebarOpen} />
         <MessageSkeleton />
         <MessageInput />
       </div>
@@ -62,7 +55,7 @@ const ChatContainer = ({ isGlobalMode }) => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-900">
-      <ChatHeader />
+      <ChatHeader setSidebarOpen={setSidebarOpen} />
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
@@ -89,8 +82,8 @@ const ChatContainer = ({ isGlobalMode }) => {
             </div>
             <div
               className={`chat-bubble ${
-                message.senderId === authUser._id 
-                  ? "bg-purple-600 text-white" 
+                message.senderId === authUser._id
+                  ? "bg-purple-600 text-white"
                   : "bg-pink-600 text-white"
               }`}
             >
@@ -111,4 +104,4 @@ const ChatContainer = ({ isGlobalMode }) => {
   );
 };
 
-export default ChatContainer;
+export default ChatArea;

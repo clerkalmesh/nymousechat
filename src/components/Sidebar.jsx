@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import useAuthStore from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users, Search, X, Globe } from "lucide-react";
+import { Users, Search, X, Globe, ChevronLeft } from "lucide-react";
 
-const Sidebar = ({ isGlobalMode, setIsGlobalMode }) => {
+const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen }) => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     getUsers();
@@ -25,49 +24,47 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode }) => {
   const handleSelectUser = (user) => {
     setSelectedUser(user);
     setIsGlobalMode(false);
-    if (window.innerWidth < 1024) setIsMobileOpen(false);
+    setSidebarOpen(false);
   };
 
   const handleSelectGlobal = () => {
     setIsGlobalMode(true);
     setSelectedUser(null);
-    if (window.innerWidth < 1024) setIsMobileOpen(false);
+    setSidebarOpen(false);
   };
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
   return (
     <>
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 btn btn-circle btn-sm bg-purple-900/50 border-purple-500 text-purple-300 hover:bg-purple-800/70"
-      >
-        <Users size={20} />
-      </button>
-
-      {isMobileOpen && (
+      {/* Overlay untuk mobile */}
+      {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/70 z-40 lg:hidden"
-          onClick={() => setIsMobileOpen(false)}
+          onClick={() => setSidebarOpen(false)}
         />
       )}
 
       <aside
         className={`
-          h-full bg-gray-900 border-r border-pink-500/30 flex flex-col transition-all duration-300
-          fixed lg:relative z-50 w-72
-          ${isMobileOpen ? "left-0" : "-left-72 lg:left-0"}
+          fixed lg:relative inset-y-0 left-0 z-50
+          w-72 bg-gray-900 border-r border-pink-500/30
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Header Sidebar ala terminal */}
+        {/* Header */}
         <div className="border-b border-pink-500/30 p-4 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Users className="size-5 text-pink-400" />
-              <span className="font-semibold text-pink-300">Contacts</span>
+              <span className="font-semibold text-pink-300">Kontak</span>
             </div>
-            <button onClick={() => setIsMobileOpen(false)} className="lg:hidden text-pink-300">
-              <X size={20} />
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden text-pink-300"
+            >
+              <ChevronLeft size={20} />
             </button>
           </div>
 
@@ -90,7 +87,7 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode }) => {
                 onChange={(e) => setShowOnlineOnly(e.target.checked)}
                 className="checkbox checkbox-xs border-pink-500 [--chkbg:theme(colors.pink.500)]"
               />
-              <span className="text-purple-300">Online only</span>
+              <span className="text-purple-300">Hanya online</span>
             </label>
             <span className="text-xs text-pink-400/70">
               {onlineUsers.length - 1} online
@@ -117,7 +114,7 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode }) => {
           </div>
         </button>
 
-        {/* Daftar Kontak */}
+        {/* Daftar User */}
         <div className="flex-1 overflow-y-auto py-2">
           {filteredUsers.length === 0 ? (
             <div className="text-center text-pink-500/50 py-8 font-mono">Tidak ada kontak</div>

@@ -36,6 +36,7 @@ const MessageInput = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Gagal mengirim pesan:", error);
+      toast.error("Gagal mengirim pesan");
     }
   };
 

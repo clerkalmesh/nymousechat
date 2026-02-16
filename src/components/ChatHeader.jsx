@@ -1,8 +1,8 @@
-import { X } from "lucide-react";
+import { X, Menu } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 
-const ChatHeader = () => {
+const ChatHeader = ({ setSidebarOpen }) => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
 
@@ -11,6 +11,13 @@ const ChatHeader = () => {
   return (
     <div className="p-3 border-b border-pink-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex items-center justify-between">
       <div className="flex items-center gap-3">
+        {/* Tombol menu untuk mobile */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="lg:hidden btn btn-ghost btn-sm btn-circle text-pink-300"
+        >
+          <Menu size={18} />
+        </button>
         <div className="avatar">
           <div className="size-10 rounded-full border border-pink-500/50">
             <img
