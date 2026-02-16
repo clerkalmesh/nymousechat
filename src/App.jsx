@@ -17,13 +17,13 @@ import { Toaster } from "react-hot-toast";
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { theme } = useThemeStore();
-  const { initAudio, play } = useAudioStore();
+  const { initAudio } = useAudioStore();
 
   useEffect(() => {
     // Inisialisasi audio (pastikan file ada di public/music/background.mp3)
     initAudio("/auth.mp3");
     // Coba autoplay (akan mute dulu)
-    play();
+    // play();
   }, []);
 
 

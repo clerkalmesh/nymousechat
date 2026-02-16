@@ -3,7 +3,7 @@ import { create } from "zustand";
 export const useAudioStore = create((set, get) => ({
   audio: null,
   isPlaying: false,
-  isMuted: true, // default mute agar autoplay diizinkan
+  isMuted: true, // default mute agar autoplay tidak bermasalah
   volume: 0.5,
 
   initAudio: (src) => {
@@ -11,7 +11,7 @@ export const useAudioStore = create((set, get) => ({
     const audio = new Audio(src);
     audio.loop = true;
     audio.volume = 0.5;
-    audio.muted = true; // mute untuk autoplay
+    audio.muted = true;
 
     audio.addEventListener("play", () => set({ isPlaying: true }));
     audio.addEventListener("pause", () => set({ isPlaying: false }));
@@ -25,7 +25,9 @@ export const useAudioStore = create((set, get) => ({
   play: () => {
     const { audio } = get();
     if (audio) {
-      audio.play().catch((e) => console.log("Play error", e));
+      // Jika ingin langsung terdengar, unmute sebelum play
+      // audio.muted = false;
+      audio.play().catch((e) => console.log("Play gagal", e));
     }
   },
 

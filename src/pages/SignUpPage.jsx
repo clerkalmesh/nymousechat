@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
 import MatrixRain from '../components/MatrixRain';
+import { useAudioStore } from '../store/useAudioStore'; 
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -13,7 +14,8 @@ const SignUpPage = () => {
   const [executionLogs, setExecutionLogs] = useState([]);
   const [error, setError] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
-
+  
+  const { play } = useAudioStore();
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
  
   const typeLine = async (line, speed = 40) => {
@@ -26,6 +28,7 @@ const SignUpPage = () => {
   };
 
   const handleGenerate = () => {
+    play();
     setError('');
     setShowTerminal(true);
     setIsGenerating(true);

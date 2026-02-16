@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
 import MatrixRain from '../components/MatrixRain';
+import { useAudioStore } from '../store/useAudioStore'; 
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ const LoginPage = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionLogs, setExecutionLogs] = useState([]);
   const [error, setError] = useState('');
+
+  const { play } = useAudioStore();
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -30,6 +33,8 @@ const LoginPage = () => {
     setIsExecuting(true);
     setExecutionLogs([]);
     setError('');
+    
+    play();
 
     setExecutionLogs(['$']);
     await typeLine('$ auth --verify', 50);
