@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import useAuthStore from "../store/useAuthStore";
-import { formatMessageTime } from "../lib/utils";
+import { formatMessageTime, formatMessageDate } from "../lib/utils";
 import { Send, Image, X, ChevronLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -64,6 +64,23 @@ const GlobalChat = ({ setSidebarOpen }) => {
     }
   };
 
+  // Kelompokkan pesan berdasarkan tanggal
+  const groupMessagesByDate = () => {
+    const groups = [];
+    let currentDate = null;
+    globalMessages.forEach((msg) => {
+      const msgDate = new Date(msg.createdAt).toDateString();
+      if (msgDate !== currentDate) {
+        currentDate = msgDate;
+        groups.push({ type: "date", date: msg.createdAt });
+      }
+      groups.push({ type: "message", message: msg });
+    });
+    return groups;
+  };
+
+  const groupedMessages = groupMessagesByDate();
+
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-900">
       {/* Header Global Chat */}
@@ -81,44 +98,73 @@ const GlobalChat = ({ setSidebarOpen }) => {
       </div>
 
       {/* Daftar Pesan Global */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {globalMessages.map((msg) => {
-          const isOwn = msg.senderId === authUser?._id;
-          return (
-            <div key={msg._id} className={`chat ${isOwn ? "chat-end" : "chat-start"}`}>
-              <div className="chat-image avatar">
-                <div className="size-8 rounded-full border border-pink-500/50">
-                  <img
-                    src={
-                      isOwn
-                        ? authUser?.profilePic || "/avatar.png"
-                        : msg.senderProfilePic || "/avatar.png"
-                    }
-                    alt="avatar"
-                  />
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {groupedMessages.map((item, index) => {
+          if (item.type === "date") {
+            return (
+              <div key={`date-${index}`} className="flex justify-center my-2">
+                <div className="bg-gray-800 text-pink-300 text-xs px-3 py-1 rounded-full border border-pink-500/30 font-mono">
+                  {formatMessageDate(item.date)}
                 </div>
               </div>
-              <div className="chat-header text-xs text-pink-400/50 flex items-center gap-1 flex-wrap">
-                <span className="font-mono">{msg.senderName || "Anonymous"}</span>
-                <span>•</span>
-                <span className="font-mono">{msg.senderAnonymousId || "??????"}</span>
-                <span>•</span>
-                <time>{formatMessageTime(msg.createdAt)}</time>
-              </div>
-              <div
-                className={`chat-bubble ${
-                  isOwn ? "bg-cyan-600 text-white" : "bg-pink-600 text-white"
-                }`}
-              >
-                {msg.image && (
-                  <img
-                    src={msg.image}
-                    alt="attachment"
-                    className="max-w-[200px] rounded-md mb-2"
-                  />
+            );
+          }
+
+          const msg = item.message;
+          const isOwn = msg.senderId === authUser?._id;
+
+          return (
+            <div
+              key={msg._id}
+              className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
+            >
+              {/* Avatar untuk pesan orang lain */}
+              {!isOwn && (
+                <div className="flex-shrink-0">
+                  <div className="size-8 rounded-full border border-pink-500/50 overflow-hidden">
+                    <img
+                      src={msg.senderProfilePic || "/avatar.png"}
+                      alt="avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className={`flex flex-col max-w-[70%] ${isOwn ? "items-end" : "items-start"}`}>
+                {/* Nama pengirim untuk pesan orang lain */}
+                {!isOwn && (
+                  <span className="text-xs text-pink-400 mb-1 font-mono ml-1">
+                    {msg.senderName || "Anonymous"} • {msg.senderAnonymousId}
+                  </span>
                 )}
-                {msg.text && <p className="break-words">{msg.text}</p>}
+                {/* Bubble pesan */}
+                <div
+                  className={`
+                    rounded-2xl px-4 py-2 break-words
+                    ${
+                      isOwn
+                        ? "bg-cyan-600 text-white rounded-br-none"
+                        : "bg-pink-600 text-white rounded-bl-none"
+                    }
+                  `}
+                >
+                  {msg.image && (
+                    <img
+                      src={msg.image}
+                      alt="attachment"
+                      className="max-w-[200px] rounded-md mb-2"
+                    />
+                  )}
+                  {msg.text && <p className="text-sm">{msg.text}</p>}
+                  <div className={`text-[10px] mt-1 ${isOwn ? "text-cyan-200" : "text-pink-200"} text-right`}>
+                    {formatMessageTime(msg.createdAt)}
+                  </div>
+                </div>
               </div>
+
+              {/* Spacer untuk menjaga layout saat pesan sendiri (tanpa avatar) */}
+              {isOwn && <div className="w-8" />}
             </div>
           );
         })}
