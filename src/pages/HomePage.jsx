@@ -1,94 +1,68 @@
-// pages/HomePage.jsx
 import { useState } from "react";
-import ChatSidebar from "@/components/ChatSidebar";
-import ChatHeader from "@/components/ChatHeader";
-import MessageInput from "@/components/MessageInput";
-import NoChatSelected from "@/components/NoChatSelected";
-import { useChatStore } from "@/store/useChatStore";
-import useAuthStore from "@/store/useAuthStore";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { formatMessageTime } from "@/lib/message";
+import Sidebar from "../components/Sidebar";
+import ChatArea from "../components/ChatArea";
+import NoChatSelected from "../components/NoChatSelected";
+import { useChatStore } from "../store/useChatStore";
+import useAuthStore from "../store/useAuthStore";
+import AudioControls from "../components/AudioControls";
 
 const HomePage = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isGlobalMode, setIsGlobalMode] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { messages, selectedUser } = useChatStore();
+  const { selectedUser } = useChatStore();
   const { authUser } = useAuthStore();
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900">
-      {/* Header dengan judul aja (TANPA AUDIO) */}
-      <header className="h-14 px-4 border-b border-pink-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="size-8 rounded-lg bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">M</span>
+    <div className="h-screen bg-gray-900 flex">
+      {/* Sidebar - sekarang full height tanpa navbar terpisah */}
+      <Sidebar
+        isGlobalMode={isGlobalMode}
+        setIsGlobalMode={setIsGlobalMode}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-full relative">
+        {/* Header yang menyatu dengan chat */}
+        <div className="bg-gray-900/80 backdrop-blur-sm border-b border-pink-500/30 px-4 py-2 flex items-center justify-between lg:justify-end">
+          {/* Tombol menu untuk mobile */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden btn btn-circle btn-sm bg-purple-900/50 border-purple-500 text-purple-300 hover:bg-purple-800/70"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {/* Profil dan kontrol di kanan (desktop) */}
+          <div className="flex items-center gap-3">
+            {/* Audio Controls - muncul di semua mode */}
+            <AudioControls />
+            
+            {/* Link ke profil */}
+            <button
+              onClick={() => window.location.href = '/profile'}
+              className="btn btn-circle btn-sm bg-purple-900/50 border-purple-500 text-purple-300 hover:bg-purple-800/70"
+              title="Profile"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </button>
           </div>
-          <h1 className="text-lg font-bold text-pink-300">Memesh</h1>
         </div>
-        {/* KOSONG - ga ada audio di sini */}
-      </header>
-      
-      <div className="flex-1 flex overflow-hidden">
-        <ChatSidebar 
-          isGlobalMode={isGlobalMode}
-          setIsGlobalMode={setIsGlobalMode}
-          mobileOpen={mobileOpen}
-          setMobileOpen={setMobileOpen}
-        />
 
-        {/* Main Chat Area */}
-        <main className="flex-1 flex flex-col bg-gray-900">
-          <ChatHeader 
-            onMenuClick={() => setMobileOpen(true)}
-            isGlobal={isGlobalMode}
+        {/* Chat Area atau No Chat Selected */}
+        {selectedUser || isGlobalMode ? (
+          <ChatArea 
+            isGlobalMode={isGlobalMode} 
+            setSidebarOpen={setSidebarOpen}
           />
-
-          {(!selectedUser && !isGlobalMode) ? (
-            <NoChatSelected />  
-          ) : (
-            <>
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-4">
-                  {messages.map((message) => {
-                    const isOwn = message.senderId === authUser?._id;
-                    return (
-                      <div
-                        key={message._id}
-                        className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div className={`flex gap-2 max-w-[70%] ${isOwn ? 'flex-row-reverse' : ''}`}>
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={isOwn ? authUser?.profilePic : selectedUser?.profilePic} />
-                            <AvatarFallback>?</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className={`rounded-lg p-3 ${
-                              isOwn ? 'bg-cyan-600' : 'bg-pink-600'
-                            }`}>
-                              {message.image && (
-                                <img 
-                                  src={message.image} 
-                                  alt="attachment" 
-                                  className="max-w-[200px] rounded mb-2"
-                                />
-                              )}
-                              {message.text && <p>{message.text}</p>}
-                            </div>
-                            <p className="text-xs text-pink-400/50 mt-1">
-                              {formatMessageTime(message.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-              <MessageInput />
-            </>
-          )}
-        </main>
+        ) : (
+          <NoChatSelected setSidebarOpen={setSidebarOpen} />
+        )}
       </div>
     </div>
   );
