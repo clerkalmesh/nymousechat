@@ -8,7 +8,7 @@ import { useChatStore } from "@/store/useChatStore";
 import useAuthStore from "@/store/useAuthStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { formatMessageTime } from "@/lib/utils";
+import { formatMessageTime } from "@/lib/message";
 
 const HomePage = () => {
   const [isGlobalMode, setIsGlobalMode] = useState(false);
@@ -45,7 +45,7 @@ const HomePage = () => {
           />
 
           {(!selectedUser && !isGlobalMode) ? (
-            <NoChatSelected />  {/* AudioControls ada di sini! */}
+            <NoChatSelected />  
           ) : (
             <>
               <ScrollArea className="flex-1 p-4">
