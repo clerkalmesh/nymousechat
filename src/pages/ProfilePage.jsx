@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
 import MatrixRain from '../components/MatrixRain';
-import { Camera, User, Mail, Calendar, Shield, Info, LogOut, ArrowLeft } from 'lucide-react';
+import { Camera, User, Mail, Calendar, Shield, Info, LogOut, ArrowLeft, Edit2, X, Check } from 'lucide-react';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { authUser, isUpdatingProfile, updateProfilePic, logout } = useAuthStore();
+  const { authUser, isUpdatingProfile, updateProfile, logout } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(null);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newDisplayName, setNewDisplayName] = useState(authUser?.displayName || '');
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -21,11 +23,24 @@ const ProfilePage = () => {
       const base64Image = reader.result;
       setSelectedImg(base64Image);
       try {
-        await updateProfilePic(base64Image);
+        await updateProfile({ profilePic: base64Image });
       } catch (error) {
         console.error('Upload gagal', error);
       }
     };
+  };
+
+  const handleUpdateDisplayName = async () => {
+    if (!newDisplayName.trim() || newDisplayName === authUser?.displayName) {
+      setIsEditingName(false);
+      return;
+    }
+    try {
+      await updateProfile({ displayName: newDisplayName.trim() });
+      setIsEditingName(false);
+    } catch (error) {
+      console.error('Gagal update display name', error);
+    }
   };
 
   const handleLogout = async () => {
@@ -106,14 +121,63 @@ const ProfilePage = () => {
 
                 {/* Info identitas */}
                 <div className="space-y-3">
+                  {/* Display Name dengan edit */}
                   <div className="bg-black/40 border border-purple-500/30 rounded-lg p-3">
-                    <div className="flex items-center gap-2 text-purple-300 text-sm mb-1">
-                      <User size={14} />
-                      <span>NAMA TAMPILAN</span>
+                    <div className="flex items-center justify-between text-purple-300 text-sm mb-1">
+                      <div className="flex items-center gap-2">
+                        <User size={14} />
+                        <span>NAMA TAMPILAN</span>
+                      </div>
+                      {!isEditingName && (
+                        <button
+                          onClick={() => setIsEditingName(true)}
+                          className="text-pink-400 hover:text-pink-300"
+                          title="Edit nama"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                      )}
                     </div>
-                    <div className="text-pink-300 font-mono text-sm sm:text-base pl-6 break-words">
-                      {authUser?.displayName || 'Anonymous'}
-                    </div>
+
+                    {isEditingName ? (
+                      <div className="flex items-center gap-2 mt-1">
+                        <input
+                          type="text"
+                          value={newDisplayName}
+                          onChange={(e) => setNewDisplayName(e.target.value)}
+                          className="flex-1 bg-black/60 border border-pink-500/50 rounded px-3 py-1 text-pink-300 text-sm focus:outline-none focus:border-pink-400"
+                          placeholder="Nama baru..."
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleUpdateDisplayName();
+                            if (e.key === 'Escape') {
+                              setIsEditingName(false);
+                              setNewDisplayName(authUser?.displayName || '');
+                            }
+                          }}
+                        />
+                        <button
+                          onClick={handleUpdateDisplayName}
+                          disabled={isUpdatingProfile}
+                          className="text-green-400 hover:text-green-300 disabled:opacity-50"
+                        >
+                          <Check size={18} />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsEditingName(false);
+                            setNewDisplayName(authUser?.displayName || '');
+                          }}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-pink-300 font-mono text-sm sm:text-base pl-6 break-words">
+                        {authUser?.displayName || 'Anonymous'}
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-black/40 border border-purple-500/30 rounded-lg p-3">
@@ -234,6 +298,7 @@ const ProfilePage = () => {
             <p>
               <span className="text-pink-300">Memesh Network</span> berkomitmen melindungi privasi Anda.
             </p>
+            {/* Tambahkan teks kebijakan lengkap di sini */}
           </div>
 
           <div className="modal-action">

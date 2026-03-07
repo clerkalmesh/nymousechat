@@ -94,21 +94,21 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  updateProfile: async (profilePic) => {
-    set({ isUpdatingProfile: true });
-    try {
-      const res = await axiosInstance.put("/auth/update-profile", { profilePic });
-      set({ authUser: res.data });
-      toast.success("Foto profil diperbarui");
-      return res.data;
-    } catch (error) {
-      console.error("Update profile pic error:", error);
-      toast.error(error.response?.data?.message || "Gagal memperbarui foto profil");
-      throw error;
-    } finally {
-      set({ isUpdatingProfile: false });
-    }
-  },
+  updateProfile: async (data) => {
+  set({ isUpdatingProfile: true });
+  try {
+    const res = await axiosInstance.put("/auth/update-profile", data);
+    set({ authUser: res.data });
+    toast.success("Profil diperbarui");
+    return res.data;
+  } catch (error) {
+    console.error("Update profile error:", error);
+    toast.error(error.response?.data?.message || "Gagal memperbarui profil");
+    throw error;
+  } finally {
+    set({ isUpdatingProfile: false });
+  }
+},
 
   clearSignupData: () => set({ signupData: null }),
 
