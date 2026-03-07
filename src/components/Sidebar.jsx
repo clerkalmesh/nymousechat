@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import useAuthStore from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users, Search, X, Globe, ChevronLeft } from "lucide-react";
+import { Users, Search, Globe, ChevronLeft } from "lucide-react";
 
 const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen }) => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
@@ -49,12 +49,13 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen })
         className={`
           fixed lg:relative inset-y-0 left-0 z-50
           w-72 bg-gray-900 border-r border-pink-500/30
+          flex flex-col h-full                       /* ← perbaikan utama */
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Header */}
-        <div className="border-b border-pink-500/30 p-4 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
+        {/* Header - tidak ikut scroll */}
+        <div className="border-b border-pink-500/30 p-4 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex-shrink-0">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Users className="size-5 text-pink-400" />
@@ -95,27 +96,29 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen })
           </div>
         </div>
 
-        {/* Global Chat Item */}
-        <button
-          onClick={handleSelectGlobal}
-          className={`
-            w-full p-3 flex items-center gap-3 hover:bg-purple-900/50 transition-colors border-b border-pink-500/30
-            ${isGlobalMode ? "bg-purple-900/70 ring-1 ring-pink-500" : ""}
-          `}
-        >
-          <div className="relative flex-shrink-0">
-            <div className="size-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-              <Globe className="size-6 text-white" />
+        {/* Global Chat - tidak ikut scroll */}
+        <div className="flex-shrink-0">
+          <button
+            onClick={handleSelectGlobal}
+            className={`
+              w-full p-3 flex items-center gap-3 hover:bg-purple-900/50 transition-colors border-b border-pink-500/30
+              ${isGlobalMode ? "bg-purple-900/70 ring-1 ring-pink-500" : ""}
+            `}
+          >
+            <div className="relative flex-shrink-0">
+              <div className="size-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                <Globe className="size-6 text-white" />
+              </div>
             </div>
-          </div>
-          <div className="flex-1 text-left min-w-0">
-            <div className="font-medium text-pink-300">🌍 Global Chat</div>
-            <div className="text-sm text-purple-300/70">Semua user online</div>
-          </div>
-        </button>
+            <div className="flex-1 text-left min-w-0">
+              <div className="font-medium text-pink-300">🌍 Global Chat</div>
+              <div className="text-sm text-purple-300/70">Semua user online</div>
+            </div>
+          </button>
+        </div>
 
-        {/* Daftar User */}
-        <div className="flex-1 overflow-y-auto py-2">
+        {/* Daftar User - scrollable */}
+        <div className="flex-1 overflow-y-auto py-2 min-h-0">
           {filteredUsers.length === 0 ? (
             <div className="text-center text-pink-500/50 py-8 font-mono">Tidak ada kontak</div>
           ) : (
