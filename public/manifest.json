@@ -2,7 +2,7 @@
   "id": "app.vercel.nymousechat.twa",
   "name": "Memesh Network",
   "short_name": "Memesh",
-  "description": "Platform komunikasi anonim yang memprioritaskan privasi tingkat tinggi tanpa pengumpulan data pribadi. Hubungkan diri secara bebas tanpa identitas, reputasi, atau jejak digital melalui arsitektur yang ringan dan aman.",
+  "description": "Platform komunikasi anonim yang memprioritaskan privasi tingkat tinggi.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -14,29 +14,36 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "/logoapp.png",
+      "src": "logoapp.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logoapp.png",
+      "src": "logoapp.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "logoapp.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "logoapp.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "prefer_related_applications": true,
-  "launch_handler": {
-    "client_mode": "focus-existing"
-  },
-  /*"shortcuts": [
+  "prefer_related_applications": false,
+  "shortcuts": [
     {
-      "name": "My Profile",
-      "short_name": "Profile",
-      "url": "/profile",
-      "description": "Buka ruang obrolan anonim segera",
-      "icons": [{ "src": "/avatar.png", "sizes": "192x192" }]
+      "name": "Global Chat",
+      "url": "/",
+      "icons": [{ "src": "logoapp.png", "sizes": "192x192" }]
     }
-  ]*/
+  ]
 }
