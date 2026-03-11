@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
-import MatrixRain from '../components/MatrixRain';
+//import MatrixRain from '../components/MatrixRain';
 import { Camera, User, Mail, Calendar, Shield, Info, LogOut, ArrowLeft, Edit2, X, Check } from 'lucide-react';
 
 const ProfilePage = () => {
@@ -50,7 +50,6 @@ const ProfilePage = () => {
 
   return (
     <>
-      <MatrixRain />
       
       {/* Header profil */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-pink-500/30 px-4 py-2 flex items-center">
