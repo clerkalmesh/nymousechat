@@ -1,14 +1,17 @@
+// components/Sidebar.jsx (update)
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import useAuthStore from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users, Search, Globe, ChevronLeft } from "lucide-react";
+import { Users, Search, ChevronLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
-const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen }) => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
+const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+  const { getUsers, users, isUsersLoading } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     getUsers();
@@ -21,15 +24,8 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen })
       user.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const handleSelectUser = (user) => {
-    setSelectedUser(user);
-    setIsGlobalMode(false);
-    setSidebarOpen(false);
-  };
-
-  const handleSelectGlobal = () => {
-    setIsGlobalMode(true);
-    setSelectedUser(null);
+  const handleSelectUser = (userId) => {
+    navigate(`/chat/${userId}`);
     setSidebarOpen(false);
   };
 
@@ -49,12 +45,12 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen })
         className={`
           fixed lg:relative inset-y-0 left-0 z-50
           w-72 bg-gray-900 border-r border-pink-500/30
-          flex flex-col h-full                       /* ← perbaikan utama */
+          flex flex-col h-full
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Header - tidak ikut scroll */}
+        {/* Header */}
         <div className="border-b border-pink-500/30 p-4 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex-shrink-0">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -96,28 +92,26 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen })
           </div>
         </div>
 
-        {/* Global Chat - tidak ikut scroll */}
+        {/* Global Chat Link */}
         <div className="flex-shrink-0">
-          <button
-            onClick={handleSelectGlobal}
-            className={`
-              w-full p-3 flex items-center gap-3 hover:bg-purple-900/50 transition-colors border-b border-pink-500/30
-              ${isGlobalMode ? "bg-purple-900/70 ring-1 ring-pink-500" : ""}
-            `}
+          <Link
+            to="/global"
+            className="w-full p-3 flex items-center gap-3 hover:bg-purple-900/50 transition-colors border-b border-pink-500/30"
+            onClick={() => setSidebarOpen(false)}
           >
             <div className="relative flex-shrink-0">
               <div className="size-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                <Globe className="size-6 text-white" />
+                <img src="/global.png" className="size-6 text-white" alt="group" />
               </div>
             </div>
             <div className="flex-1 text-left min-w-0">
               <div className="font-medium text-pink-300">🌍 Global Chat</div>
               <div className="text-sm text-purple-300/70">Semua user online</div>
             </div>
-          </button>
+          </Link>
         </div>
 
-        {/* Daftar User - scrollable */}
+        {/* Daftar User */}
         <div className="flex-1 overflow-y-auto py-2 min-h-0">
           {filteredUsers.length === 0 ? (
             <div className="text-center text-pink-500/50 py-8 font-mono">Tidak ada kontak</div>
@@ -125,11 +119,8 @@ const Sidebar = ({ isGlobalMode, setIsGlobalMode, sidebarOpen, setSidebarOpen })
             filteredUsers.map((user) => (
               <button
                 key={user._id}
-                onClick={() => handleSelectUser(user)}
-                className={`
-                  w-full p-3 flex items-center gap-3 hover:bg-purple-900/50 transition-colors
-                  ${selectedUser?._id === user._id ? "bg-purple-900/70 ring-1 ring-pink-500" : ""}
-                `}
+                onClick={() => handleSelectUser(user._id)}
+                className="w-full p-3 flex items-center gap-3 hover:bg-purple-900/50 transition-colors"
               >
                 <div className="relative flex-shrink-0">
                   <img
