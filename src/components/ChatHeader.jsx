@@ -19,11 +19,11 @@ const ChatHeader = ({ setSidebarOpen }) => {
           <ChevronLeft size={18} />
         </button>
         <div className="avatar">
-          <div className="size-8 rounded-full border border-pink-500/50">
+          <div className="size-15 lg:size-20 rounded-full border border-pink-500/50">
             <img
               src={selectedUser.profilePic || "/avatar.png"}
               alt={selectedUser.displayName}
-              className=" w-10"
+              className=" w-full"
             />
           </div>
         </div>

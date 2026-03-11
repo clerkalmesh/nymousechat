@@ -1,13 +1,11 @@
-// pages/GlobalChatPage.jsx
 import { useEffect, useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import useAuthStore from "../store/useAuthStore";
 import { formatMessageTime, formatMessageDate } from "../lib/utils";
-import { Send, Image, X, ArrowLeft } from "lucide-react";
+import { Send, Image, X, ChevronLeft } from "lucide-react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
 
-const GlobalChatPage = () => {
+const GlobalChat = ({ setSidebarOpen }) => {
   const { globalMessages, getGlobalMessages, sendGlobalMessage, subscribeToGlobal, unsubscribeFromGlobal } =
     useChatStore();
   const { authUser } = useAuthStore();
@@ -84,17 +82,17 @@ const GlobalChatPage = () => {
   const groupedMessages = groupMessagesByDate();
 
   return (
-    <div className="h-screen bg-gray-900 flex flex-col">
+    <div className="flex-1 flex flex-col h-full bg-gray-900">
       {/* Header Global Chat */}
-      <div className="p-4 border-b border-pink-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex items-center gap-3">
-        <Link
-          to="/"
-          className="btn btn-ghost btn-sm btn-circle text-pink-300 hover:bg-pink-500/20"
+      <div className="p-3 border-b border-pink-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex items-center gap-2">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="lg:hidden btn btn-ghost btn-sm btn-circle text-pink-300 hover:bg-pink-500/20"
         >
-          <ArrowLeft size={20} />
-        </Link>
+          <ChevronLeft size={18} />
+        </button>
         <div className="flex-1">
-          <h3 className="font-semibold text-pink-300 text-lg">🌍 Global Chat</h3>
+          <h3 className="font-semibold text-pink-300">🌍 Global Chat</h3>
           <p className="text-xs text-purple-300/70">Semua Anonymous online di sini</p>
         </div>
       </div>
@@ -174,7 +172,7 @@ const GlobalChatPage = () => {
       </div>
 
       {/* Input Form */}
-      <form onSubmit={(e) => e.preventDefault()} className="p-4 border-t border-pink-500/30 bg-gray-900 flex flex-col gap-2">
+      <form onSubmit={(e) => e.preventDefault()} className="p-3 border-t border-pink-500/30 bg-gray-900 flex flex-col gap-2">
         {imagePreview && (
           <div className="flex items-center gap-2">
             <div className="relative">
@@ -214,7 +212,7 @@ const GlobalChatPage = () => {
             className={`btn btn-circle ${imagePreview ? "text-pink-400" : "text-purple-400"}`}
             onClick={() => fileInputRef.current?.click()}
           >
-            <Image size={20} />
+            <Image size={18} />
           </button>
           <button
             type="button"
@@ -222,7 +220,7 @@ const GlobalChatPage = () => {
             onClick={handleSend}
             disabled={!text.trim() && !imagePreview}
           >
-            <Send size={20} />
+            <Send size={18} />
           </button>
         </div>
       </form>
@@ -230,4 +228,4 @@ const GlobalChatPage = () => {
   );
 };
 
-export default GlobalChatPage;
+export default GlobalChat;
